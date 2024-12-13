@@ -1,0 +1,25 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+hostname = "control-plane"
+
+# All Vagrant configuration is done below. The "2" in Vagrant.configure
+# configures the configuration version (we support older styles for
+# backwards compatibility). Please don't change it unless you know what
+# you're doing.
+Vagrant.configure("2") do |config|
+  config.vm.box = "generic-x64/ubuntu2204"
+  config.vm.box_version = "4.3.12"
+
+  config.vm.define hostname
+  config.vm.hostname = hostname
+
+  config.vm.provider :libvirt do |libvirt|
+    # Enable forwarding of forwarded_port with id 'ssh'.
+    libvirt.forward_ssh_port = true
+  end
+
+  config.vm.provision "ansible" do |ansible|
+    ansible.playbook = "../../ansible/control_plane_playbook.yaml"
+  end
+end

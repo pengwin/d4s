@@ -1,0 +1,13 @@
+- name: Install Kubelet
+  ansible.builtin.apt:
+    name: kubelet={{ kube_version }}.*
+    state: present
+    update_cache: true
+
+- name: Enable the Kubelet service, and enable it persistently
+  ansible.builtin.service:
+    name: kubelet
+    enabled: true
+
+- name: Run node_joined.log
+  ansible.builtin.script: fetched/control-plane/home/vagrant/join_command.log

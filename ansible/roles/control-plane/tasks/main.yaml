@@ -1,0 +1,61 @@
+- name: Install Kubelet
+  ansible.builtin.apt:
+    name: kubelet={{ kube_version }}.*
+    state: present
+    update_cache: true
+
+- name: Enable the Kubelet service, and enable it persistently
+  ansible.builtin.service:
+    name: kubelet
+    enabled: true
+
+- name: Create an empty file for Kubeadm configuring
+  ansible.builtin.copy:
+    content: ""
+    dest: /etc/kubernetes/kubeadm-config.yaml
+    force: false
+    mode: '0644'
+    owner: root
+    group: root
+
+- name: Configuring kubelet
+  ansible.builtin.template:
+    src: etc/kubernetes/kubeadm-config.j2.yaml
+    dest: /etc/kubernetes/kubeadm-config.yaml
+    mode: "0755"
+    owner: root
+    group: root
+
+- name: Populate service facts
+  ansible.builtin.service_facts:
+
+- name: Initialize the cluster (this could take some time)
+  ansible.builtin.shell: kubeadm init --config /etc/kubernetes/kubeadm-config.yaml > cluster_initialized.log
+  args:
+    chdir: /home/vagrant
+    creates: cluster_initialized.log
+  when: ansible_facts['services']['kubelet']['status'] | default('not-found') != 'active'
+
+- name: Fetch cluster_initialized.log
+  ansible.builtin.fetch:
+    src: /home/vagrant/cluster_initialized.log
+    dest: ./fetched
+    force: true
+
+- name: Fetch kube config
+  ansible.builtin.fetch:
+    src: /etc/kubernetes/admin.conf
+    dest: ./fetched
+    force: true
+
+- name: Get join command
+  ansible.builtin.shell: kubeadm token create --print-join-command > join_command.log
+  args:
+    chdir: /home/vagrant
+    creates: join_command.log
+
+- name: Fetch join_command.sh
+  ansible.builtin.fetch:
+    src: /home/vagrant/join_command.log
+    dest: ./fetched
+    force: true

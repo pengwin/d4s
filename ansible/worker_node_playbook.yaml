@@ -1,0 +1,8 @@
+- name: Worker node Playbook
+  hosts:
+    - worker-node-red
+    - worker-node-blue
+  become: true
+  roles:
+    - kube-node
+    - worker-node
