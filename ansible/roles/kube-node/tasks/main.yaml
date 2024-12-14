@@ -1,2 +1,4 @@
+- name: Configure linux
+  ansible.builtin.import_tasks: ./configure_linux.yaml
 - name: Install dependencies
   ansible.builtin.import_tasks: ./install_dependencies.yaml

@@ -1,2 +1,4 @@
+cluster_name: test-kubernetes
+control_plane_node_name: control-plane
 kube_adm_token: qtdgxt.ubss7fjq2p58l4l7
 advertise_address: 0.0.0.0

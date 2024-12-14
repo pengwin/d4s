@@ -1,0 +1,11 @@
+apiVersion: kubeadm.k8s.io/v1beta4
+kind: JoinConfiguration
+caCertPath: /etc/kubernetes/pki/ca.crt
+discovery:
+  bootstrapToken:
+    apiServerEndpoint: {{ control_plane_endpoint }}
+    token: {{ kube_adm_token }}
+    caCertHashes:
+    - {{ discovery_token_ca_cert_hash }}
+nodeRegistration:
+  criSocket: unix:///var/run/containerd/containerd.sock

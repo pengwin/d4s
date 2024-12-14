@@ -2,19 +2,19 @@ kubceconfig := "ansible/fetched/control-plane/etc/kubernetes/admin.conf"
 
 up: day-one
 
-day-one: control-plane-up workers
+day-one: nodes-up
     ansible-playbook ./ansible/day_one_playbook.yaml
 
-workers: control-plane-up
+nodes-up:
     just vms/kube-vm/vm-up
-
-control-plane-up:
-    just vms/kube-vm/vm-up control-plane
 
 # Utility targets
 
 nodes:
     KUBECONFIG={{kubceconfig}} kubectl get nodes -o wide
+
+all-pods:
+    KUBECONFIG={{kubceconfig}} kubectl get pods --all-namespaces
 
 clean:
     just vms/kube-vm/clean

@@ -4,6 +4,7 @@
   roles:
     - kube-node
     - control-plane
+    - helm-bootstrapper
     - flannel-networking
 - name: Worker node Playbook
   hosts:

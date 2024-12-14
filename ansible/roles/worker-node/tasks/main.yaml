@@ -9,5 +9,34 @@
     name: kubelet
     enabled: true
 
-- name: Run node_joined.log
-  ansible.builtin.script: fetched/control-plane/home/vagrant/join_command.log
+- name: TCP port 6443 on master is reachable from worker
+  ansible.builtin.wait_for:
+    host: "{{ hostvars['control-plane']['ansible_default_ipv4']['address'] }}"
+    port: 6443
+    timeout: 60
+    delay: 1
+
+- name: Generate join config
+  ansible.builtin.template:
+    src: etc/kubernetes/join.j2.yaml
+    dest: /etc/kubernetes/join.yaml
+    mode: "0755"
+    owner: root
+    group: root
+  vars:
+    control_plane_endpoint: "{{ hostvars['control-plane']['ansible_default_ipv4']['address'] }}:6443"
+    kube_adm_token: "{{ hostvars['control-plane']['join_token'] }}"
+    discovery_token_ca_cert_hash: "{{ hostvars['control-plane']['discovery_token_ca_cert_hash'] }}"
+
+- name: Join cluster
+  ansible.builtin.shell: kubeadm join --config /etc/kubernetes/join.yaml > join.log
+  args:
+    chdir: /home/vagrant
+    creates: join.log
+
+- name: Fetch join.log
+  ansible.builtin.fetch:
+    src: /home/vagrant/join.log
+    dest: ./fetched
+    force: true
+
