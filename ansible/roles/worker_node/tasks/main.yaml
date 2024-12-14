@@ -39,4 +39,3 @@
     src: /home/vagrant/join.log
     dest: ./fetched
     force: true
-

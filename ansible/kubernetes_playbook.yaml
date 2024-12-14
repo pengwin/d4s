@@ -2,15 +2,15 @@
   hosts: control-plane
   become: true
   roles:
-    - kube-node
-    - control-plane
-    - helm-bootstrapper
-    - flannel-networking
+    - kube_node
+    - control_plane
+    - helm_bootstrapper
+    - flannel_networking
 - name: Worker node Playbook
   hosts:
     - worker-node-red
     - worker-node-blue
   become: true
   roles:
-    - kube-node
-    - worker-node
+    - kube_node
+    - worker_node

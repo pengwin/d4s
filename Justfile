@@ -5,7 +5,7 @@ up: day-one
 day-one: nodes-up
     ansible-playbook ./ansible/day_one_playbook.yaml
 
-nodes-up:
+nodes-up: ansible-lint
     just vms/kube-vm/vm-up
 
 # Utility targets
@@ -25,4 +25,8 @@ install-hello-world:
 uninstall-hello-world:
     KUBECONFIG={{kubceconfig}} helm uninstall hello-world
 
+lint: ansible-lint
+
+ansible-lint:
+    just ansible/lint
 
