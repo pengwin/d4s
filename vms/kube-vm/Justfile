@@ -1,0 +1,7 @@
+empty_vm := ""
+
+vm-up vm=empty_vm:
+    vagrant up {{vm}}
+
+clean:
+    vagrant destroy -f

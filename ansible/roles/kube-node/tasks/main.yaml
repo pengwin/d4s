@@ -1,6 +1,2 @@
-- name: Populate service facts
-  ansible.builtin.service_facts:
-
 - name: Install dependencies
   ansible.builtin.import_tasks: ./install_dependencies.yaml
-  when: ansible_facts['services']['containerd']['status'] | default('not-found') == 'not-found'

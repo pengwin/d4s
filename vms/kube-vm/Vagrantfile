@@ -1,7 +1,7 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
-hostname = "control-plane"
+vms = ["control-plane", "worker-node-red", "worker-node-blue"]
 
 # All Vagrant configuration is done below. The "2" in Vagrant.configure
 # configures the configuration version (we support older styles for
@@ -11,15 +11,20 @@ Vagrant.configure("2") do |config|
   config.vm.box = "generic-x64/ubuntu2204"
   config.vm.box_version = "4.3.12"
 
-  config.vm.define hostname
-  config.vm.hostname = hostname
-
   config.vm.provider :libvirt do |libvirt|
     # Enable forwarding of forwarded_port with id 'ssh'.
     libvirt.forward_ssh_port = true
+    libvirt.graphics_type = "none"
   end
 
   config.vm.provision "ansible" do |ansible|
-    ansible.playbook = "../../ansible/control_plane_playbook.yaml"
+    ansible.playbook = "../../ansible/kubernetes_playbook.yaml"
   end
+
+  vms.each do |hostname|
+    config.vm.define hostname do |node|
+      node.vm.hostname = hostname
+    end
+  end
+  
 end

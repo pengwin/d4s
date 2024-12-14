@@ -1,3 +1,10 @@
+- name: Control Plane Playbook
+  hosts: control-plane
+  become: true
+  roles:
+    - kube-node
+    - control-plane
+    - flannel-networking
 - name: Worker node Playbook
   hosts:
     - worker-node-red
