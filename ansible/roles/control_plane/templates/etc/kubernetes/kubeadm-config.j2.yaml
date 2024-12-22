@@ -1,4 +1,5 @@
 apiVersion: kubeadm.k8s.io/v1beta4
+kind: InitConfiguration
 bootstrapTokens:
 - groups:
   - system:bootstrappers:kubeadm:default-node-token
@@ -7,7 +8,7 @@ bootstrapTokens:
   usages:
   - signing
   - authentication
-kind: InitConfiguration
+certificateKey: {{ certificate_key }}
 localAPIEndpoint:
   advertiseAddress: {{ advertise_address}}
   bindPort: 6443
@@ -28,20 +29,21 @@ timeouts:
   tlsBootstrap: 5m0s
   upgradeManifests: 5m0s
 ---
-apiServer: {}
 apiVersion: kubeadm.k8s.io/v1beta4
+kind: ClusterConfiguration
+apiServer: {}
 caCertificateValidityPeriod: 87600h0m0s
 certificateValidityPeriod: 8760h0m0s
 certificatesDir: /etc/kubernetes/pki
 clusterName: {{ cluster_name }}
 controllerManager: {}
 dns: {}
-encryptionAlgorithm: RSA-2048
+encryptionAlgorithm: ECDSA-P256
+controlPlaneEndpoint: {{ control_plane_endpoint }}
 etcd:
   local:
     dataDir: /var/lib/etcd
 imageRepository: registry.k8s.io
-kind: ClusterConfiguration
 kubernetesVersion: v1.31.3
 networking:
   dnsDomain: cluster.local

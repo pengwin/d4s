@@ -1,1 +1,1 @@
-kubeconf: /etc/kubernetes/admin.conf
+backend: host-gw

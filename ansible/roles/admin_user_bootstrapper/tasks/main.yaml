@@ -1,0 +1,106 @@
+- name: Create dir for keys
+  ansible.builtin.file:
+    path: /home/vagrant/keys
+    state: directory
+    mode: '0755'
+
+- name: Generate private key
+  community.crypto.openssl_privatekey:
+    path: "/home/vagrant/keys/{{ username }}.key"
+    type: Ed25519
+    regenerate: always
+    return_content: true
+  register: user_key
+
+- name: Generate CSR for user
+  community.crypto.openssl_csr:
+    path: "/home/vagrant/keys/{{ username }}.csr"
+    privatekey_path: "/home/vagrant/keys/{{ username }}.key"
+    common_name: "{{ username }}"
+    organization_name: test-kubernetes
+    return_content: true
+  register: user_csr
+
+- name: Create certificate singing request
+  kubernetes.core.k8s:
+    state: present
+    kubeconfig: "{{ kubeconf }}"
+    definition:
+      apiVersion: certificates.k8s.io/v1
+      kind: CertificateSigningRequest
+      metadata:
+        name: "{{ username }}"
+      spec:
+        request: "{{ user_csr.csr | ansible.builtin.b64encode }}"
+        signerName: kubernetes.io/kube-apiserver-client
+        expirationSeconds: 86400  # one day
+        usages:
+          - client auth
+
+- name: Install kubectl
+  ansible.builtin.apt:
+    name: kubectl
+    state: present
+    update_cache: true
+
+- name: Approve certificate signing request
+  ansible.builtin.command: "kubectl certificate approve {{ username }}"
+  args:
+    chdir: /home/vagrant
+  environment:
+    KUBECONFIG: "{{ kubeconf }}"
+  register: approve_log
+  changed_when: approve_log.stdout != "certificatesigningrequest.certificates.k8s.io/{{ username }} approved"
+
+- name: Bind user to cluster-admin role
+  kubernetes.core.k8s:
+    state: present
+    kubeconfig: "{{ kubeconf }}"
+    definition:
+      apiVersion: rbac.authorization.k8s.io/v1
+      kind: ClusterRoleBinding
+      metadata:
+        name: "{{ username }}-clusterrolebinding"
+      subjects:
+        - kind: User
+          name: "{{ username }}"
+          apiGroup: rbac.authorization.k8s.io
+      roleRef:
+        apiGroup: rbac.authorization.k8s.io
+        kind: ClusterRole
+        name: cluster-admin
+
+- name: Get certificate after approval
+  kubernetes.core.k8s_info:
+    kubeconfig: "{{ kubeconf }}"
+    kind: CertificateSigningRequest
+    name: "{{ username }}"
+  register: csr_info
+
+- name: Get ca
+  kubernetes.core.k8s_info:
+    kubeconfig: "{{ kubeconf }}"
+    kind: ConfigMap
+    api_version: v1
+    name: "kube-root-ca.crt"
+    namespace: kube-system
+  register: ca_info
+
+- name: Generate kubeconfig
+  ansible.builtin.template:
+    src: kube/config.j2
+    dest: "/home/vagrant/{{ username }}.conf"
+    mode: "0755"
+    owner: vagrant
+    group: vagrant
+  vars:
+    server: "{{ hostvars['control-plane-master']['ansible_default_ipv4']['address'] }}"
+    ca: "{{ ca_info.resources[0].data['ca.crt'] | ansible.builtin.b64encode }}"
+    cert: "{{ csr_info.resources[0].status.certificate }}"
+    key: "{{ user_key.privatekey | ansible.builtin.b64encode }}"
+
+- name: Fetch kube config
+  ansible.builtin.fetch:
+    src: "/home/vagrant/{{ username }}.conf"
+    dest: ./fetched
+    force: true

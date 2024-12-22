@@ -1,0 +1,19 @@
+---
+apiVersion: v1
+kind: Config
+clusters:
+  - name: {{ cluster_name }}
+    cluster:
+      certificate-authority-data: {{ ca }}
+      server: https://{{ server }}:6443
+contexts:
+  - name: {{ username }}@{{ cluster_name }}
+    context:
+      cluster: {{ cluster_name }}
+      user: {{ username }}
+users:
+  - name: {{ username }}
+    user:
+      client-certificate-data: {{ cert }}
+      client-key-data: {{ key }}
+current-context: {{ username }}@{{ cluster_name }}

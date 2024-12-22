@@ -1,12 +1,27 @@
-- name: Control Plane Playbook
-  hosts: control-plane
+- name: Control plane master
+  hosts: control-plane-master
   become: true
   roles:
     - kube_node
     - control_plane
     - helm_bootstrapper
     - flannel_networking
-- name: Worker node Playbook
+    - admin_user_bootstrapper
+  vars_files:
+    - vars/main.yaml
+
+- name: Control plane nodes
+  hosts:
+    - control-plane-red
+    - control-plane-blue
+  become: true
+  roles:
+    - kube_node
+    - control_plane_node
+  vars_files:
+    - vars/main.yaml
+
+- name: Worker nodes
   hosts:
     - worker-node-red
     - worker-node-blue
@@ -14,3 +29,5 @@
   roles:
     - kube_node
     - worker_node
+  vars_files:
+    - vars/main.yaml

@@ -25,8 +25,9 @@
     group: root
   vars:
     control_plane_endpoint: "{{ hostvars['control-plane-master']['ansible_default_ipv4']['address'] }}:6443"
-    kube_adm_token: "{{ hostvars['control-plane-master']['worker_join_token'] }}"
+    kube_adm_token: "{{ hostvars['control-plane-master']['control_join_token'] }}"
     discovery_token_ca_cert_hash: "{{ hostvars['control-plane-master']['discovery_token_ca_cert_hash'] }}"
+    certificate_key: "{{ hostvars['control-plane-master']['certificate_key'] }}"
 
 - name: Join cluster
   ansible.builtin.shell: kubeadm join --config /etc/kubernetes/join.yaml > join.log

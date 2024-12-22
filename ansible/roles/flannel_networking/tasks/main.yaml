@@ -25,4 +25,4 @@
     create_namespace: false
     values:
       flannel:
-        backend: "host-gw"
+        backend: "{{ backend }}"

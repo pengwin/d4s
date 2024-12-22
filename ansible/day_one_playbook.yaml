@@ -2,7 +2,7 @@
   hosts: localhost
   connection: local
   vars:
-    kubeconfig: fetched/control-plane/etc/kubernetes/admin.conf
+    kubeconfig: "fetched/control-plane-master/home/vagrant/{{ username }}.conf"
   tasks:
 
     - name: Add chart repo for nginx-ingress

@@ -18,6 +18,15 @@
     owner: root
     group: root
 
+- name: Generate a 32-byte AES key
+  ansible.builtin.command: openssl rand -hex 32
+  register: aes_key
+  changed_when: aes_key.stdout != 0
+
+- name: Set fact for certificate key
+  ansible.builtin.set_fact:
+    certificate_key: "{{ aes_key.stdout }}"
+
 - name: Configuring kubelet
   ansible.builtin.template:
     src: etc/kubernetes/kubeadm-config.j2.yaml
@@ -25,12 +34,15 @@
     mode: "0755"
     owner: root
     group: root
+  vars:
+    control_plane_endpoint: "{{ hostvars['control-plane-master']['ansible_default_ipv4']['address'] }}:6443"
+    certificate_key: "{{ aes_key.stdout }}"
 
 - name: Populate service facts
   ansible.builtin.service_facts:
 
 - name: Initialize the cluster (this could take some time)
-  ansible.builtin.shell: kubeadm init --config /etc/kubernetes/kubeadm-config.yaml > cluster_initialized.log
+  ansible.builtin.shell: kubeadm init --config /etc/kubernetes/kubeadm-config.yaml --upload-certs > cluster_initialized.log
   args:
     chdir: /home/vagrant
     creates: cluster_initialized.log
@@ -42,26 +54,29 @@
     dest: ./fetched
     force: true
 
-- name: Fetch kube config
-  ansible.builtin.fetch:
-    src: /etc/kubernetes/admin.conf
-    dest: ./fetched
-    force: true
-
 - name: Get CA certificate hash
   community.crypto.x509_certificate_info:
     path: /etc/kubernetes/pki/ca.crt
   register: k8s_pki_ca
 
-- name: Set fact for join command
+- name: Set fact for ca hash
   ansible.builtin.set_fact:
     discovery_token_ca_cert_hash: sha256:{{ k8s_pki_ca["public_key_fingerprints"]["sha256"] | replace(":", "") }}
 
 - name: Create join token for worker-node
   ansible.builtin.command: kubeadm token create
-  register: join_command
+  register: worker_join_command
   changed_when: false
 
-- name: Set fact for join command
+- name: Set fact for worker join command
   ansible.builtin.set_fact:
-    join_token: "{{ join_command.stdout }}"
+    worker_join_token: "{{ worker_join_command.stdout }}"
+
+- name: Create join token for control-plane-node
+  ansible.builtin.command: kubeadm token create
+  register: control_join_command
+  changed_when: false
+
+- name: Set fact for control join command
+  ansible.builtin.set_fact:
+    control_join_token: "{{ control_join_command.stdout }}"
