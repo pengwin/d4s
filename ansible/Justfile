@@ -1,2 +1,5 @@
 lint:
     ansible-lint
+
+clean:
+    rm -rf fetched

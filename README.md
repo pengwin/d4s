@@ -51,8 +51,11 @@ sudo usermod -a -G libvirt <your user>
 ```
 ansible-galaxy collection install kubernetes.core
 ```
-8. ```apt-get install python3-kubernetes```
+8. Python kubernetes ```apt-get install python3-kubernetes```
 
+9. Ansible lint ```apt-get install ansible-lint```
+
+10. [Terraform ](https://developer.hashicorp.com/terraform/tutorials/aws-get-started/install-cli)
 
 # Usage
 1. Provision vagrant nodes

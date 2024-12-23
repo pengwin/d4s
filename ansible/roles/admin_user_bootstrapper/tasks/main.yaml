@@ -17,7 +17,7 @@
     path: "/home/vagrant/keys/{{ username }}.csr"
     privatekey_path: "/home/vagrant/keys/{{ username }}.key"
     common_name: "{{ username }}"
-    organization_name: test-kubernetes
+    organization_name: "{{ cluster_name }}"
     return_content: true
   register: user_csr
 
