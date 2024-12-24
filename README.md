@@ -57,6 +57,25 @@ ansible-galaxy collection install kubernetes.core
 
 10. [Terraform ](https://developer.hashicorp.com/terraform/tutorials/aws-get-started/install-cli)
 
+11. Setup NFS fro CSI
+
+```
+sudo apt install nfs-kernel-server
+sudo mkdir -p /srv/nfs/k8s_csi
+sudo chmod 755 /srv/nfs/k8s_csi
+sudo chown nobody:nogroup /srv/nfs/shark8s_csi
+```
+Add to /etc/exports
+```
+/srv/nfs/k8s_csi 192.168.121.0/24(rw,sync,no_subtree_check)
+```
+Update config and start service
+```
+sudo exportfs -arv
+sudo systemctl enable nfs-kernel-server
+```
+
+
 # Usage
 1. Provision vagrant nodes
 ```
