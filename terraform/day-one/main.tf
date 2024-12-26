@@ -1,37 +1,49 @@
+locals {
+  storage_class_name = "nfs-storage-class"
+  cluster_issuer_name = "selfsigned-cluster-issuer"
+}
+
 module "ingress_nginx" {
   source = "./modules/ingress-nginx"
 
-  namespace = "ingress-nginx"
+  namespace     = "ingress-nginx"
   chart_version = "4.11.3"
-  release_name = "ingress-nginx"
+  release_name  = "ingress-nginx"
 }
 
 module "csi-driver-nfs" {
   source = "./modules/csi-driver-nfs"
 
-  namespace = "csi-driver-nfs"
+  namespace     = "kube-system"
   chart_version = "4.9.0"
-  release_name = "csi-driver-nfs"
+  release_name  = "csi-driver-nfs"
+
+  storage_class_name = local.storage_class_name
+  nfs_server = {
+    server = "192.168.121.1"
+    share  = "/srv/nfs/k8s_csi"
+  }
 }
 
-resource "kubernetes_storage_class" "nfs" {
-  metadata {
-    name = "nfs-storage-class"
-  }
+module "cert_manager" {
+  source = "./modules/cert-manager"
 
-  parameters = {
-    server   = "192.168.121.1"
-    path     = "/srv/nfs/k8s_csi"
-    readonly = "false"
-  }
+  namespace     = "cert-manager"
+  chart_version = "1.16.2"
+  release_name  = "cert-manager"
 
-  storage_provisioner = "nfs.csi.k8s.io"
-
-  reclaim_policy = "Delete"
-  volume_binding_mode = "Immediate"
-  allow_volume_expansion = true
-
-  depends_on = [
-    module.csi-driver-nfs
-  ]
+  cluster_issuer_name = local.cluster_issuer_name
 }
+
+module "docker-registry" {
+  source = "./modules/docker-registry"
+
+  namespace     = "docker-registry"
+  chart_version = "2.2.3"
+  release_name  = "docker-registry"
+
+  storage_class_name = local.storage_class_name
+
+  depends_on = [module.csi-driver-nfs, module.ingress_nginx, module.cert_manager]
+}
+

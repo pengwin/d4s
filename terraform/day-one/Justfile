@@ -7,6 +7,9 @@ plan:
 apply: install
     terraform apply --auto-approve
 
+destroy: install
+    terraform destroy
+
 clean:
     rm -rf .terraform
     rm -rf .terraform.lock.hcl

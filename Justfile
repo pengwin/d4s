@@ -18,10 +18,23 @@ nodes-up: ansible-lint
 
 # Utility targets
 
-get-cluster-url:
+get-cluster-ip:
     #!/usr/bin/env bash
-    cluster_url="$(kubectl --kubeconfig {{kubeconfig}} config view -o jsonpath='{.clusters[0].cluster.server}')"
-    echo $cluster_url
+    kubectl get nodes -o jsonpath='{.items[?(@.metadata.name=="control-plane")].status.addresses[?(@.type=="InternalIP")].address}'
+
+get-docker-port:
+    #!/usr/bin/env bash
+    kubectl get svc docker-registry --namespace docker-registry -o jsonpath='{.spec.ports[?(@.name=="http-5000")].nodePort}'
+
+get-docker-registry:
+    #!/usr/bin/env bash
+    cluster_ip="$(just get-cluster-ip)"
+    docker_reg_port="$(just get-docker-port)"
+    echo $cluster_ip:$docker_reg_port
+
+extract-ca-cert:
+    #!/usr/bin/env bash
+    kubectl get secret ca-cert --namespace cert-manager -o jsonpath='{.data.tls\.crt}' | base64 -d
 
 nodes:
     KUBECONFIG={{kubeconfig}} kubectl get nodes --output=wide

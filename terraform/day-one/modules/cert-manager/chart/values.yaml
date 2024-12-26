@@ -1,0 +1,15 @@
+cluster_issuer_name: ca-cluster-issuer
+ca_secret_name: ca-cert
+
+ca_cert: {}
+  #tls_crt:
+  #tls_key:
+
+# list of certificates to issue
+certificates: []
+
+#certificates:
+#- common_name: docker-registry
+#  cert_name: docker-reg-cert
+#  secret_name: docker-reg-cert
+#  namespace: docker-registry

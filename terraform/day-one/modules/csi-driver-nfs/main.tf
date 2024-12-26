@@ -19,3 +19,24 @@ resource "helm_release" "csi-driver-nfs" {
     })
   ]
 }
+
+resource "kubernetes_storage_class" "nfs" {
+  metadata {
+    name = var.storage_class_name
+  }
+
+  parameters = {
+    server = var.nfs_server.server
+    share  = var.nfs_server.share
+  }
+
+  storage_provisioner = "nfs.csi.k8s.io"
+
+  reclaim_policy         = "Delete"
+  volume_binding_mode    = "Immediate"
+  allow_volume_expansion = true
+
+  depends_on = [
+    helm_release.csi-driver-nfs
+  ]
+}

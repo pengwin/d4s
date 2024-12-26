@@ -1,5 +1,8 @@
 day-one:
     just day-one/apply
 
+destroy:
+    just day-one/destroy
+
 clean:
     just day-one/clean
