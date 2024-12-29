@@ -59,6 +59,7 @@ Vagrant.configure("2") do |config|
             "cluster_name": cluster_name,
             "username": ENV["USERNAME"],
             "machines": vms,
+            "ca_cert_path": ENV["CA_CERT_PATH"],
           }
           #ansible.verbose = "vv"
         end

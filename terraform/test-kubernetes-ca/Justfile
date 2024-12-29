@@ -4,13 +4,11 @@ install:
 plan:
     terraform plan
 
-apply cluster_master_ip ca_key_file_path ca_cert_file_path kubeconfig_file_path: install
+apply key_file_path cert_file_path: install
     #!/usr/bin/env bash
     terraform apply --auto-approve \
-    -var "cluster_master_ip={{cluster_master_ip}}" \
-    -var "ca_key_file_path={{ca_key_file_path}}" \
-    -var "ca_cert_file_path={{ca_cert_file_path}}" \
-    -var "kubeconfig_file_path={{kubeconfig_file_path}}"
+    -var "key_file_path={{key_file_path}}" \
+    -var "cert_file_path={{cert_file_path}}"
 
 destroy: install
     terraform destroy

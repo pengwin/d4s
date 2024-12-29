@@ -1,9 +1,7 @@
 empty_vm := ""
-default_cluster_name := "test"
-default_username := "vagrant"
 
-vm-up user_name=default_username cluster_name=default_cluster_name vm=empty_vm:
-    CLUSTER_NAME={{cluster_name}} USERNAME={{user_name}} vagrant up {{vm}}
+vm-up user_name cluster_name ca_cert_path vm=empty_vm:
+    CLUSTER_NAME={{cluster_name}} USERNAME={{user_name}} CA_CERT_PATH={{ca_cert_path}} vagrant up {{vm}}
 
 clean:
     vagrant destroy -f

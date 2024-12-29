@@ -1,0 +1,12 @@
+---
+- name: Copy ca.crt to machine
+  ansible.builtin.copy:
+    src: "{{ ca_cert_path }}"
+    dest: /etc/pki/ca-trust/source/anchors/test-kubernetes-ca.pem
+    owner: root
+    group: root
+    mode: "0644"
+
+- name: Update the CA trust
+  ansible.builtin.command: update-ca-trust
+  changed_when: true

@@ -1,17 +1,9 @@
 provider "helm" {
   kubernetes {
-    config_path = "../../.kube/config"
+    config_path = var.kubeconfig_file_path
   }
-
-  # localhost registry with password protection
-  #registry {
-  #  url = "oci://localhost:5000"
-  #  username = "username"
- #   password = "password"
- # }
-
 }
 
 provider "kubernetes" {
-  config_path = "../../.kube/config"
+  config_path = var.kubeconfig_file_path
 }

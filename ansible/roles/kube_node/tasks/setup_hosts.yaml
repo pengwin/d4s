@@ -1,0 +1,6 @@
+- name: Ensure docker-registry points to the correct IP
+  ansible.builtin.lineinfile:
+    path: /etc/hosts
+    search_string: 'docker-registry.test-kubernetes'
+    line: "{{ machines['control-plane-master'] }} docker-registry.test-kubernetes"
+    state: present

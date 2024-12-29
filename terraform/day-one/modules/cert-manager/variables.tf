@@ -21,3 +21,13 @@ variable "cluster_issuer_name" {
   type        = string
   default     = "selfsigned-cluster-issuer"
 }
+
+variable "ca_key_file_path" {
+  description = "Path to the CA private key file"
+  type        = string
+}
+
+variable "ca_cert_file_path" {
+  description = "Path to the CA certificate file"
+  type        = string
+}

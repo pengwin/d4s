@@ -1,0 +1,4 @@
+server = "https://docker-registry.test-kubernetes"
+
+[host."https://docker-registry.test-kubernetes"]
+  ca = "/etc/pki/ca-trust/source/anchors/test-kubernetes-ca.pem"

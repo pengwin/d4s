@@ -1,0 +1,4 @@
+address_pool_name: nodes-pool
+cluster_master_ip: ""
+
+advertisement_name: ""

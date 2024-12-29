@@ -13,7 +13,7 @@ resource "helm_release" "nginx_ingress" {
       controller = {
         service = {
           kind = "daemonset"
-          type = "NodePort"
+          type = "LoadBalancer"
         }
       }
     })
