@@ -1,6 +1,7 @@
 
 # Prerequisites
 
+0. [Just](https://just.systems/man/en/pre-built-binaries.html)
 1. Install [Vagrant](https://developer.hashicorp.com/vagrant/install?product_intent=vagrant) 
 2. Install qemu and libvirt
 ```
@@ -67,7 +68,7 @@ sudo chown nobody:nogroup /srv/nfs/shark8s_csi
 ```
 Add to /etc/exports
 ```
-/srv/nfs/k8s_csi 192.168.121.0/24(rw,sync,no_subtree_check)
+/srv/nfs/k8s_csi 172.16.122.0/24(rw,sync,no_subtree_check)
 ```
 Update config and start service
 ```

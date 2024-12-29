@@ -1,7 +1,7 @@
 empty_vm := ""
 
-vm-up user_name cluster_name ca_cert_path vm=empty_vm:
-    CLUSTER_NAME={{cluster_name}} USERNAME={{user_name}} CA_CERT_PATH={{ca_cert_path}} vagrant up {{vm}}
+vm-up user_name cluster_name ca_cert_path host_ip vm=empty_vm:
+    CLUSTER_NAME={{cluster_name}} USERNAME={{user_name}} CA_CERT_PATH={{ca_cert_path}} HOST_IP={{host_ip}} vagrant up {{vm}}
 
 clean:
     vagrant destroy -f

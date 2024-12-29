@@ -1,0 +1,26 @@
+- name: Setup control plane master
+  hosts: localhost
+  connection: local
+  become: true
+  tasks:
+    - name: Check OS version
+      ansible.builtin.fail:
+        msg: "OS should be Ubuntu 22.04, not {{ ansible_distribution }} {{ ansible_distribution_version }}"
+      when: ansible_distribution != 'Ubuntu' or ansible_distribution_version != '24.04'
+
+    - name: Copy ca.pem to machine
+      ansible.builtin.copy:
+        content: "{{ lookup('file', ca_cert_path) }}"
+        dest: /etc/ssl/certs/test-cluster-ca.pem
+        owner: root
+        group: root
+        mode: "0644"
+
+    - name: Update the CA trust
+      ansible.builtin.command: update-ca-certificates
+      register: ca_update_log
+      changed_when: "'1 added' in ca_update_log.stdout"
+
+    - name: Dbg - CA update log
+      ansible.builtin.debug:
+        var: ca_update_log.stdout_lines

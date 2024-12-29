@@ -42,7 +42,7 @@ module "csi-driver-nfs" {
 
   storage_class_name = local.storage_class_name
   nfs_server = {
-    server = "192.168.121.1"
+    server = var.nfs_server
     share  = "/srv/nfs/k8s_csi"
   }
 
@@ -95,8 +95,7 @@ resource "kubernetes_config_map" "coredns" {
            lameduck 5s
         }
         ready
-        hosts {
-          ${var.cluster_master_ip} docker-registry.test-kubernetes
+        hosts /etc/coredns/test_kubernetes_db test-kubernetes {
           fallthrough
         }
         kubernetes cluster.local in-addr.arpa ip6.arpa {
@@ -113,6 +112,11 @@ resource "kubernetes_config_map" "coredns" {
         reload
         loadbalance
     }
+    EOF
+    test_kubernetes_db = <<EOF
+    # This is a custom domain file for CoreDNS
+    # Format: <IP> <DOMAIN>
+    ${var.cluster_master_ip} docker-registry.test-kubernetes
     EOF
   }
 

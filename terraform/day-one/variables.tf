@@ -16,5 +16,9 @@ variable "ca_cert_file_path" {
 variable "kubeconfig_file_path" {
   description = "Path to the kubeconfig file"
   type        = string
-  
+}
+
+variable "nfs_server" {
+  description = "The IP address of the NFS server"
+  type        = string
 }

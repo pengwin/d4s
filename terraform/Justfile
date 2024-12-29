@@ -6,8 +6,8 @@ lint-day-one:
 lint-test-kubernetes-ca:
     just test-kubernetes-ca/lint
 
-day-one cluster_master_ip ca_key_file_path ca_cert_file_path kubeconfig_file_path:
-    just day-one/apply {{cluster_master_ip}} {{ca_key_file_path}} {{ca_cert_file_path}} {{kubeconfig_file_path}}
+day-one cluster_master_ip ca_key_file_path ca_cert_file_path kubeconfig_file_path nfs_server:
+    just day-one/apply {{cluster_master_ip}} {{ca_key_file_path}} {{ca_cert_file_path}} {{kubeconfig_file_path}} {{nfs_server}}
 
 test_kubernetes_ca key_file_path cert_file_path:
     just test-kubernetes-ca/apply {{key_file_path}} {{cert_file_path}}

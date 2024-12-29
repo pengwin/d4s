@@ -40,6 +40,8 @@ spec:
             - name: http
               containerPort: {{ .Values.service.port }}
               protocol: TCP
+          env:
+            {{- toYaml .Values.env | nindent 12 }}
           livenessProbe:
             {{- toYaml .Values.livenessProbe | nindent 12 }}
           readinessProbe:
@@ -48,9 +50,6 @@ spec:
             {{- toYaml .Values.resources | nindent 12 }}
           {{- with .Values.volumeMounts }}
           volumeMounts:
-          - name: nginx-html
-            mountPath: /usr/share/nginx/html/index.html
-            subPath: index.html
             {{- toYaml . | nindent 12 }}
           {{- end }}
       {{- with .Values.volumes }}

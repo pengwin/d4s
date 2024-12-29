@@ -1,5 +1,5 @@
 ---
-- name: Copy ca.crt to machine
+- name: Copy ca.pem to machine
   ansible.builtin.copy:
     src: "{{ ca_cert_path }}"
     dest: /etc/pki/ca-trust/source/anchors/test-kubernetes-ca.pem

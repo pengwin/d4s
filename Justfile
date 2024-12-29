@@ -2,6 +2,7 @@ user_name := "vagrant_admin"
 cluster_name := "test-kubernetes"
 fetched_kubeconfig := replace("ansible/fetched/control-plane-master/home/vagrant/${user_name}.conf", "${user_name}", user_name)
 kubeconfig := ".kube/config"
+host_ip := "172.16.122.5"
 
 # CA files
 ca_key := ".certs/ca.key"
@@ -12,14 +13,13 @@ ca_cert := ".certs/ca.crt"
 up: day-one
     #!/usr/bin/env bash
     cluster_ip="$(just get-cluster-ip)"
-    just_path="$(which just)"
     echo "Cluster is up on $cluster_ip."
     echo "Configure KUBECONFIG to access the cluster:"
     echo "export KUBECONFIG={{kubeconfig}}"
     echo "To access the docker registry, add the following line to /etc/hosts:"
     echo "$cluster_ip docker-registry.test-kubernetes"
     echo "Add ca cert to trusted storage"
-    echo "sudo $just_path update-ca-cert $just_path"
+    echo "just update-ca-cert"
 
 day-one: copy-kubeconfig
     #!/usr/bin/env bash
@@ -28,7 +28,7 @@ day-one: copy-kubeconfig
     ca_key_fullpath="$current_dir/{{ca_key}}"
     ca_cert_fullpath="$current_dir/{{ca_cert}}"
     kubeconfig_fullpath="$current_dir/{{kubeconfig}}"
-    just terraform/day-one $cluster_ip $ca_key_fullpath $ca_cert_fullpath $kubeconfig_fullpath
+    just terraform/day-one $cluster_ip $ca_key_fullpath $ca_cert_fullpath $kubeconfig_fullpath {{host_ip}}
 
 copy-kubeconfig: nodes-up
     mkdir -p .kube
@@ -38,7 +38,7 @@ nodes-up: test_kubernetes_ca lint
     #!/usr/bin/env bash
     current_dir="$(pwd)"
     ca_cert_fullpath="$current_dir/{{ca_cert}}"
-    just vms/kube-vm/vm-up {{user_name}} {{cluster_name}} $ca_cert_fullpath
+    just vms/kube-vm/vm-up {{user_name}} {{cluster_name}} $ca_cert_fullpath {{host_ip}}
 
 test_kubernetes_ca:
     #!/usr/bin/env bash
@@ -68,10 +68,10 @@ all-pods:
     KUBECONFIG={{kubeconfig}} kubectl get pods --all-namespaces --output=wide
 
 install-hello-world:
-    KUBECONFIG={{kubeconfig}} helm install hello-world ./workload/hello-world/chart
+    KUBECONFIG={{kubeconfig}} helm install --namespace hello --create-namespace hello-world ./workload/hello-world/chart
 
 uninstall-hello-world:
-    KUBECONFIG={{kubeconfig}} helm uninstall hello-world
+    KUBECONFIG={{kubeconfig}} helm uninstall --namespace hello hello-world
 
 lint: ansible-lint terraform-lint
 
@@ -84,14 +84,14 @@ terraform-lint:
 cluster-shell:
     KUBECONFIG={{kubeconfig}} kubectl run -i --tty --rm just-shell --image=docker.io/library/alpine:3.21 --restart=Never -- /bin/sh
 
+docker-login:
+    docker login docker-registry.test-kubernetes -u '' -p ''
+
 default_just_command :="just"
 
-update-ca-cert just_command=default_just_command:
+update-ca-cert:
     #!/usr/bin/env bash
     current_dir="$(pwd)"
-    echo $current_dir
     ca_cert_fullpath="$current_dir/{{ca_cert}}"
-    openssl x509 -in $ca_cert_fullpath -out /etc/ssl/certs/test-cluster-ca.pem -outform PEM
-    chmod 644 /etc/ssl/certs/test-cluster-ca.pem
-    update-ca-certificates
+    ansible-playbook --connection=local --ask-become-pass  ansible/local_ca_install_playbook.yaml -e ca_cert_path=$ca_cert_fullpath
 

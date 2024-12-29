@@ -28,7 +28,7 @@ Vagrant.configure("2") do |config|
   cluster_name = ENV["CLUSTER_NAME"]
 
   network = "vagrant-kube-libvirt"
-  host_ip = "172.16.122.5"
+  host_ip = ENV["HOST_IP"]
 
   default_network = "vagrant-libvirt"
 
