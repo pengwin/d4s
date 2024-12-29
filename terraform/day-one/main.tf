@@ -3,12 +3,22 @@ locals {
   cluster_issuer_name = "selfsigned-cluster-issuer"
 }
 
+module "flannel" {
+  source = "./modules/flannel"
+
+  namespace     = "kube-flannel"
+  chart_version = "0.26.2"
+  release_name  = "flannel"
+}
+
 module "ingress_nginx" {
   source = "./modules/ingress-nginx"
 
   namespace     = "ingress-nginx"
   chart_version = "4.11.3"
   release_name  = "ingress-nginx"
+
+  depends_on = [ module.flannel ]
 }
 
 module "csi-driver-nfs" {
@@ -23,6 +33,8 @@ module "csi-driver-nfs" {
     server = "192.168.121.1"
     share  = "/srv/nfs/k8s_csi"
   }
+
+  depends_on = [ module.flannel ]
 }
 
 module "cert_manager" {
@@ -33,6 +45,8 @@ module "cert_manager" {
   release_name  = "cert-manager"
 
   cluster_issuer_name = local.cluster_issuer_name
+
+  depends_on = [ module.flannel ]
 }
 
 module "docker-registry" {
@@ -43,6 +57,7 @@ module "docker-registry" {
   release_name  = "docker-registry"
 
   storage_class_name = local.storage_class_name
+  cluster_issuer_name = local.cluster_issuer_name
 
   depends_on = [module.csi-driver-nfs, module.ingress_nginx, module.cert_manager]
 }

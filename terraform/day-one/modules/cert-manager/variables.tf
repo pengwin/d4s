@@ -20,5 +20,4 @@ variable "cluster_issuer_name" {
   description = "The name of the cluster issuer"
   type        = string
   default     = "selfsigned-cluster-issuer"
-  
 }

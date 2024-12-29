@@ -21,6 +21,10 @@
     return_content: true
   register: user_csr
 
+- name: Install kubernetes lib for python
+  ansible.builtin.pip:
+    name: kubernetes
+
 - name: Create certificate singing request
   kubernetes.core.k8s:
     state: present
@@ -38,7 +42,7 @@
           - client auth
 
 - name: Install kubectl
-  ansible.builtin.apt:
+  ansible.builtin.dnf:
     name: kubectl
     state: present
     update_cache: true
@@ -51,6 +55,7 @@
     KUBECONFIG: "{{ kubeconf }}"
   register: approve_log
   changed_when: approve_log.stdout != "certificatesigningrequest.certificates.k8s.io/{{ username }} approved"
+
 
 - name: Bind user to cluster-admin role
   kubernetes.core.k8s:
@@ -94,7 +99,7 @@
     owner: vagrant
     group: vagrant
   vars:
-    server: "{{ hostvars['control-plane-master']['ansible_default_ipv4']['address'] }}"
+    server: "{{ machines['control-plane-master'] }}"
     ca: "{{ ca_info.resources[0].data['ca.crt'] | ansible.builtin.b64encode }}"
     cert: "{{ csr_info.resources[0].status.certificate }}"
     key: "{{ user_key.privatekey | ansible.builtin.b64encode }}"

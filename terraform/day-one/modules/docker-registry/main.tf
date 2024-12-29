@@ -1,6 +1,6 @@
 locals {
   secret_name        = "docker-reg-cert"
-  common_name        = "docker-registry.docker-registry.cluster.local"
+  common_name        = "docker-registry.docker-registry.svc.cluster.local"
 }
 
 resource "helm_release" "docker-registry" {
@@ -25,13 +25,17 @@ resource "helm_release" "docker-registry" {
         storageClass = var.storage_class_name
       }
 
-      #tlsSecretName = local.secret_name
+      service = {
+        type = "ClusterIP"
+        port = 80
+      }
 
       ingress = {
         enabled = true
         annotations = {
-          "nginx.ingress.kubernetes.io/proxy-body-size" = "500m"
-          "nginx.org/proxy-body-size" = "500m"
+          "nginx.ingress.kubernetes.io/proxy-body-size" = "50m"
+          "nginx.org/proxy-body-size" = "50m",
+          "cert-manager.io/cluster-issuer" = var.cluster_issuer_name
         }
         hosts = [
           local.common_name

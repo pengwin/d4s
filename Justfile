@@ -4,6 +4,20 @@ fetched_kubeconfig := replace("ansible/fetched/control-plane-master/home/vagrant
 kubeconfig := ".kube/config"
 
 up: day-one
+    #!/usr/bin/env bash
+    cluster_ip="$(just get-cluster-ip)"
+    echo "Cluster is up on $cluster_ip."
+    echo "Configure KUBECONFIG to access the cluster:"
+    echo "export KUBECONFIG={{kubeconfig}}"
+    echo "To access the docker registry, add the following line to /etc/hosts:"
+    echo "127.0.0.1 docker-registry.docker-registry.svc.cluster.local"
+    echo "Add ca cert to trusted storage"
+    echo "just extract-ca-cert | sudo tee /etc/ssl/certs/test-cluster-ca.crt"
+    echo "sudo openssl x509 -in /etc/ssl/certs/test-cluster-ca.crt -out /etc/ssl/certs/test-cluster-ca.pem -outform PEM"
+    echo "sudo chmod 644 /etc/ssl/certs/test-cluster-ca.pem"
+    echo "sudo update-ca-certificates"
+    echo "Forward ingress nginx to localhost"
+    echo "sudo KUBECONFIG={{kubeconfig}} kubectl port-forward -n ingress-nginx service/ingress-nginx-controller 443:https"
 
 day-one: copy-kubeconfig
     just terraform/day-one
@@ -20,7 +34,7 @@ nodes-up: ansible-lint
 
 get-cluster-ip:
     #!/usr/bin/env bash
-    kubectl get nodes -o jsonpath='{.items[?(@.metadata.name=="control-plane")].status.addresses[?(@.type=="InternalIP")].address}'
+    KUBECONFIG={{kubeconfig}} kubectl get nodes -o jsonpath='{.items[?(@.metadata.name=="control-plane-master")].status.addresses[?(@.type=="InternalIP")].address}'
 
 get-docker-port:
     #!/usr/bin/env bash
@@ -34,7 +48,7 @@ get-docker-registry:
 
 extract-ca-cert:
     #!/usr/bin/env bash
-    kubectl get secret ca-cert --namespace cert-manager -o jsonpath='{.data.tls\.crt}' | base64 -d
+    KUBECONFIG={{kubeconfig}} kubectl get secret ca-cert --namespace cert-manager -o jsonpath='{.data.tls\.crt}' | base64 -d
 
 nodes:
     KUBECONFIG={{kubeconfig}} kubectl get nodes --output=wide
@@ -58,4 +72,16 @@ lint: ansible-lint
 
 ansible-lint:
     just ansible/lint
+
+cluster-shell:
+    KUBECONFIG={{kubeconfig}} kubectl run -i --tty --rm just-shell --image=apline --restart=Never -- /bin/sh
+
+default_just_command :="just"
+
+proxy-nginx just_command=default_just_command:
+    {{just_command}} extract-ca-cert | tee /etc/ssl/certs/test-cluster-ca.crt
+    openssl x509 -in /etc/ssl/certs/test-cluster-ca.crt -out /etc/ssl/certs/test-cluster-ca.pem -outform PEM
+    chmod 644 /etc/ssl/certs/test-cluster-ca.pem
+    sudo update-ca-certificates
+    KUBECONFIG={{kubeconfig}} kubectl port-forward -n ingress-nginx service/ingress-nginx-controller 443:https
 

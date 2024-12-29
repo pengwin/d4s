@@ -11,3 +11,6 @@ nodeRegistration:
   criSocket: unix:///var/run/containerd/containerd.sock
   imagePullPolicy: IfNotPresent
   imagePullSerial: true
+  kubeletExtraArgs:
+  - name: node-ip
+    value: "{{ advertise_address }}"

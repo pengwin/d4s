@@ -1,22 +1,7 @@
-- name: Install Kubelet
-  ansible.builtin.apt:
-    name: kubelet={{ kube_version }}.*
+- name: Install openssl
+  ansible.builtin.dnf:
+    name: openssl
     state: present
-    update_cache: true
-
-- name: Enable the Kubelet service, and enable it persistently
-  ansible.builtin.service:
-    name: kubelet
-    enabled: true
-
-- name: Create an empty file for Kubeadm configuring
-  ansible.builtin.copy:
-    content: ""
-    dest: /etc/kubernetes/kubeadm-config.yaml
-    force: false
-    mode: '0644'
-    owner: root
-    group: root
 
 - name: Generate a 32-byte AES key
   ansible.builtin.command: openssl rand -hex 32
@@ -27,22 +12,24 @@
   ansible.builtin.set_fact:
     certificate_key: "{{ aes_key.stdout }}"
 
-- name: Configuring kubelet
+- name: Generate config for kubeadm
   ansible.builtin.template:
     src: etc/kubernetes/kubeadm-config.j2.yaml
     dest: /etc/kubernetes/kubeadm-config.yaml
-    mode: "0755"
+    mode: "0644"
     owner: root
     group: root
   vars:
-    control_plane_endpoint: "{{ hostvars['control-plane-master']['ansible_default_ipv4']['address'] }}:6443"
+    control_plane_endpoint: "{{ machines['control-plane-master'] }}:6443"
     certificate_key: "{{ aes_key.stdout }}"
+    advertise_address: "{{ machines[inventory_hostname] }}"
 
 - name: Populate service facts
   ansible.builtin.service_facts:
 
+
 - name: Initialize the cluster (this could take some time)
-  ansible.builtin.shell: kubeadm init --config /etc/kubernetes/kubeadm-config.yaml --upload-certs > cluster_initialized.log
+  ansible.builtin.shell: kubeadm init --config /etc/kubernetes/kubeadm-config.yaml --upload-certs --v=5 > cluster_initialized.log
   args:
     chdir: /home/vagrant
     creates: cluster_initialized.log
@@ -53,6 +40,20 @@
     src: /home/vagrant/cluster_initialized.log
     dest: ./fetched
     force: true
+
+- name: Install openssl-devel
+  ansible.builtin.dnf:
+    name: openssl-devel
+    state: present
+
+- name: Install pip
+  ansible.builtin.dnf:
+    name: python3-pip
+    state: present
+
+- name: Install pyOpenSSL python package
+  ansible.builtin.pip:
+    name: pyopenssl
 
 - name: Get CA certificate hash
   community.crypto.x509_certificate_info:

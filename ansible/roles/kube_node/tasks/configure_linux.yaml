@@ -1,18 +1,26 @@
 ---
 - name: Check OS version
   ansible.builtin.fail:
-    msg: "OS should be Ubuntu 22.04, not {{ ansible_distribution }} {{ ansible_distribution_version }}"
-  when: ansible_distribution != 'Ubuntu' or ansible_distribution_version != '22.04'
+    msg: "OS should be Centos 9, not {{ ansible_distribution }} {{ ansible_distribution_version }}"
+  when: ansible_distribution != 'CentOS' or ansible_distribution_version != '9'
 
 - name: Populate service facts
   ansible.builtin.service_facts:
 
-- name: Disable SWAP in fstab (Kubeadm requirement)
-  ansible.builtin.replace:
-    path: /etc/fstab
-    regexp: '^([^#].*?\sswap\s+sw\s+.*)$'
-    replace: '# \1'
-  changed_when: ansible_swaptotal_mb == 0
+- name: Write noswap systemd unit file
+  ansible.builtin.template:
+    src: etc/systemd/system/noswap.service.j2
+    dest: /etc/systemd/system/noswap.service
+    owner: root
+    group: root
+    mode: "0644"
+
+- name: Enable noswap service
+  ansible.builtin.systemd:
+    name: noswap
+    state: started
+    enabled: true
+    daemon_reload: true
 
 - name: Disable SWAP (Kubeadm requirement)
   ansible.builtin.command:

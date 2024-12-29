@@ -2,3 +2,7 @@
   ansible.builtin.import_tasks: ./configure_linux.yaml
 - name: Install dependencies
   ansible.builtin.import_tasks: ./install_dependencies.yaml
+- name: Enable the Kubelet service, and enable it persistently
+  ansible.builtin.service:
+    name: kubelet
+    enabled: true

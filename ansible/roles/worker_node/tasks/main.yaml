@@ -1,17 +1,6 @@
-- name: Install Kubelet
-  ansible.builtin.apt:
-    name: kubelet={{ kube_version }}.*
-    state: present
-    update_cache: true
-
-- name: Enable the Kubelet service, and enable it persistently
-  ansible.builtin.service:
-    name: kubelet
-    enabled: true
-
 - name: TCP port 6443 on master is reachable from worker
   ansible.builtin.wait_for:
-    host: "{{ hostvars['control-plane-master']['ansible_default_ipv4']['address'] }}"
+    host: "{{ machines['control-plane-master'] }}"
     port: 6443
     timeout: 60
     delay: 1
@@ -24,9 +13,10 @@
     owner: root
     group: root
   vars:
-    control_plane_endpoint: "{{ hostvars['control-plane-master']['ansible_default_ipv4']['address'] }}:6443"
+    control_plane_endpoint: "{{ machines['control-plane-master'] }}:6443"
     kube_adm_token: "{{ hostvars['control-plane-master']['worker_join_token'] }}"
     discovery_token_ca_cert_hash: "{{ hostvars['control-plane-master']['discovery_token_ca_cert_hash'] }}"
+    advertise_address: "{{ machines[inventory_hostname] }}"
 
 - name: Join cluster
   ansible.builtin.shell: kubeadm join --config /etc/kubernetes/join.yaml > join.log

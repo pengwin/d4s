@@ -20,3 +20,8 @@ variable "storage_class_name" {
   description = "The name of the storage class for the registry"
   type        = string
 }
+
+variable "cluster_issuer_name" {
+  description = "The name of the cert-manager cluster issuer"
+  type        = string
+}

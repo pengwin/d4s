@@ -68,20 +68,13 @@ resource "helm_release" "cert-issuers" {
 
   values = [
     yamlencode({
-      cluster_issuer_name = "ca-cluster-issuer"
+      cluster_issuer_name = var.cluster_issuer_name
       ca_secret_name      = "ca-cert"
 
       ca_cert = {
         tls_crt = tls_self_signed_cert.ca_cert.cert_pem
         tls_key = tls_private_key.ca_private_key.private_key_pem
       }
-
-      certificates = [{
-        common_name = "docker-registry.docker-registry.cluster.local"
-        cert_name   = "docker-reg-cert"
-        secret_name = "docker-reg-cert"
-        namespace   = "docker-registry"
-      }]
     })
   ]
 
