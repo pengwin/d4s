@@ -29,3 +29,8 @@ variable "nfs_server" {
   description = "The IP address of the NFS server"
   type        = string
 }
+
+variable "pi_hole_password" {
+  description = "The password for the pi-hole web interface"
+  type        = string
+}

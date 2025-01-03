@@ -6,4 +6,6 @@ locals {
   ca_cert_file_path = "${get_parent_terragrunt_dir()}/../.certs/ca.crt"
 
   kubeconfig_file_path = "${get_parent_terragrunt_dir()}/../.kube/config"
+
+  pi_hole_password = "12345"
 }

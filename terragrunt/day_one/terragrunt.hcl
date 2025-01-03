@@ -2,6 +2,11 @@ terraform {
   source = "../../terraform/day-one"
 }
 
+include "env" {
+  path   = find_in_parent_folders("env.hcl")
+  expose = true
+}
+
 dependency "ca_cert" {
   config_path = "../kubernetes-ca"
 
@@ -31,4 +36,5 @@ inputs = {
   ca_cert_file_pem       = dependency.ca_cert.outputs.ca_cert
   kubeconfig_file_path   = dependency.k8s_cluster.outputs.k8s_admin_conf_path
   nfs_server             = dependency.k8s_cluster.outputs.host_ip
+  pi_hole_password       = include.env.locals.pi_hole_password
 }

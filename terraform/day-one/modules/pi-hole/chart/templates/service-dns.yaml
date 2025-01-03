@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "chart.fullname" . }}-dns
+  labels:
+    {{- include "chart.labels" . | nindent 4 }}
+  annotations:
+    metallb.ip/allow-shared-ip: {{ .Values.service.allowSharedIP }}
+spec:
+  type: LoadBalancer
+  ports:
+    - name: dns
+      port: 53
+      targetPort: {{ .Values.service.dnsPort }} 
+      protocol: UDP
+  selector:
+    {{- include "chart.selectorLabels" . | nindent 4 }}

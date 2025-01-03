@@ -77,6 +77,30 @@ module "docker-registry" {
   depends_on = [module.csi-driver-nfs, module.ingress_nginx, module.cert_manager]
 }
 
+module "pi_hole" {
+  source = "./modules/pi-hole"
+
+  namespace     = "pi-hole"
+  chart_version = "0.0.1"
+  release_name  = "pi-hole"
+
+  pi_hole_password = var.pi_hole_password
+
+  depends_on = [module.ingress_nginx]
+}
+
+module "external-dns" {
+  source = "./modules/external-dns"
+
+  namespace     = "external-dns"
+  chart_version = "1.15.0"
+  release_name  = "external-dns"
+
+  pi_hole_password = var.pi_hole_password
+
+  depends_on = [module.pi_hole]
+}
+
 import {
   to = kubernetes_config_map.coredns
   id = "kube-system/coredns"

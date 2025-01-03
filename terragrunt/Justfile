@@ -2,7 +2,10 @@ fmt:
     terragrunt hclfmt
     terragrunt run-all fmt
 
-apply:
+init:
+    terragrunt run-all init
+
+apply: init
     TF_LOG=INFO terragrunt run-all apply
 
 destroy:

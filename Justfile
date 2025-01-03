@@ -54,6 +54,7 @@ update-ca-cert:
     current_dir="$(pwd)"
     ca_cert_fullpath="$current_dir/{{ca_cert}}"
     ansible-playbook --connection=local --ask-become-pass  ansible/local_ca_install_playbook.yaml -e ca_cert_path=$ca_cert_fullpath
+    diff $ca_cert_fullpath /etc/ssl/certs/test-cluster-ca.pem
 
 # Utility targets
 

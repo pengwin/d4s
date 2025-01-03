@@ -1,0 +1,22 @@
+# Default values for chart.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+nameOverride: ""
+fullnameOverride: ""
+
+image:
+  repository: docker.io/pihole/pihole
+  pullPolicy: Always
+  tag: "2024.07.0"
+
+pi_hole_password: "12345"
+
+service:
+  containerPort: 5000
+  dnsPort: 53
+  allowSharedIP: "nginx"
+
+ingress:
+  host: pi-hole.test-kubernetes
+  certIssuer: selfsigned-cluster-issuer
