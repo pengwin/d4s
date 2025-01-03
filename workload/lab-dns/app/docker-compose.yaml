@@ -1,0 +1,28 @@
+services:
+  dns-server:
+    image: docker-registry.test-kubernetes/dns-server:0.0.1
+    build:
+      context: .
+      args:
+        - APP_NAME=lab-dns
+    ports:
+      - "1053:1053/udp"
+    environment:
+      - DNS_DOMAIN_SERVED=test-kubernetes
+      - DNS_UDP_ENDPOINT=0.0.0.0:1053
+      - DNS_HTTP_ENDPOINT=0.0.0.0:8080
+
+  dns-server-webhook:
+    image: docker-registry.test-kubernetes/dns-server-webhook:0.0.1
+    build:
+      context: .
+      args:
+        - APP_NAME=lab-webhook
+    ports:
+      - "8888:8888"
+      - "8080:8080"
+    environment:
+      - DNS_WEBHOOK_EXPOSED_ENDPOINT=0.0.0.0:8080
+      - DNS_WEBHOOK_INTERNAL_ENDPOINT=0.0.0.0:8888
+      - DNS_DNS_SERVER=http://dns-server:8080
+      - RUST_BACKTRACE=1

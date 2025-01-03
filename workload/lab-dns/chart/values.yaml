@@ -1,0 +1,18 @@
+# Default values for chart.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+nameOverride: ""
+fullnameOverride: ""
+
+image:
+  repository: docker-registry.test-kubernetes/dns-server
+  pullPolicy: Always
+  tag: "0.0.1"
+
+serviceAccount:
+  name: ""
+
+service:
+  containerPort: 5000
+  dnsPort: 1053

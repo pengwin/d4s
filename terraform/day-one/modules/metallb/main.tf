@@ -35,7 +35,10 @@ resource "helm_release" "metallb_config" {
   values = [
     yamlencode({
       cluster_issuer_name = local.ip_pool_name
-      cluster_master_ip   = "${var.cluster_master_ip}/32"
+      ips = [
+        var.cluster_master_ip,
+        var.cluster_worker_node
+      ]
     })
   ]
 

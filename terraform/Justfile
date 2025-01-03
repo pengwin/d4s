@@ -1,19 +1,27 @@
-lint: lint-day-one lint-test-kubernetes-ca
+lint: lint-day-one lint-test-kubernetes-ca lint-lab-dns
 
 lint-day-one:
     just day-one/lint
 
+lint-lab-dns:
+    just lab-dns/lint
+
 lint-test-kubernetes-ca:
     just test-kubernetes-ca/lint
 
-day-one cluster_master_ip ca_key_file_path ca_cert_file_path kubeconfig_file_path nfs_server:
-    just day-one/apply {{cluster_master_ip}} {{ca_key_file_path}} {{ca_cert_file_path}} {{kubeconfig_file_path}} {{nfs_server}}
+day-one cluster_master_ip cluster_worker_node ca_key_file_path ca_cert_file_path kubeconfig_file_path nfs_server:
+    just day-one/apply {{cluster_master_ip}} {{cluster_worker_node}} {{ca_key_file_path}} {{ca_cert_file_path}} {{kubeconfig_file_path}} {{nfs_server}}
+
+lab-dns cluster_master_ip kubeconfig_file_path:
+    just lab-dns/apply {{cluster_master_ip}} {{kubeconfig_file_path}}
 
 test_kubernetes_ca key_file_path cert_file_path:
     just test-kubernetes-ca/apply {{key_file_path}} {{cert_file_path}}
 
 destroy:
     just day-one/destroy
+    just lab-dns/destroy
 
 clean:
     just day-one/clean
+    just lab-dns/clean

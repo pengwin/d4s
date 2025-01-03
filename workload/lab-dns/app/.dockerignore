@@ -1,0 +1,8 @@
+.env
+Dockerfile
+docker-compose.yaml
+Justfile
+webhook.yaml
+.gitignore
+.dockerignore
+target/

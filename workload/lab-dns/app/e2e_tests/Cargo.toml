@@ -1,0 +1,15 @@
+[package]
+name = "e2e_tests"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+reqwest = { version = "^0.12", features = ["json", "multipart"] }
+tokio = { version = "1.42.0", features = ["test-util"] }
+
+dotenvy = "0.15.7"
+
+webhook-client = { path = "../generated/webhook-client" }
+anyhow = "1.0.95"
+hickory-client = "0.24.2"
+

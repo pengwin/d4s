@@ -20,3 +20,8 @@ variable "cluster_master_ip" {
   description = "The IP address of the Kubernetes master node"
   type        = string
 }
+
+variable "cluster_worker_node" {
+  description = "The IP address of the Kubernetes first worker node"
+  type        = string
+}

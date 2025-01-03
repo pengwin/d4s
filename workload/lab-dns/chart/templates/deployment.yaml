@@ -1,0 +1,61 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "chart.fullname" . }}
+  labels:
+    {{- include "chart.labels" . | nindent 4 }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "chart.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/component: WebApi
+        {{- include "chart.labels" . | nindent 8 }}
+    spec:
+      #imagePullSecrets:
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            allowPrivilegeEscalation: false
+            privileged: false
+            runAsUser: 1000
+            runAsGroup: 3000
+            fsGroup: 2000
+            supplementalGroups: [4000]
+            capabilities:
+              drop:
+              - ALL
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.service.containerPort }}
+              protocol: TCP
+            - name: dns
+              containerPort: {{ .Values.service.dnsPort }}
+              protocol: UDP
+          env:
+            - name: DNS_DOMAIN_SERVED
+              value: .test-kubernetes
+            - name: DNS_UDP_ENDPOINT
+              value: 0.0.0.0:{{ .Values.service.dnsPort }}
+            - name: DNS_HTTP_ENDPOINT
+              value: 0.0.0.0:{{ .Values.service.containerPort }}
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+          resources:
+            limits:
+              cpu: 100m
+              memory: 128Mi
+            requests:
+              cpu: 100m
+              memory: 128Mi

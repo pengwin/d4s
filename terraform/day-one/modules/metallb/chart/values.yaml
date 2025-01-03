@@ -1,4 +1,4 @@
 address_pool_name: nodes-pool
-cluster_master_ip: ""
+ips: []
 
 advertisement_name: ""

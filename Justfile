@@ -24,11 +24,12 @@ up: day-one
 day-one: copy-kubeconfig
     #!/usr/bin/env bash
     cluster_ip="$(just get-cluster-ip)"
+    worker_node_id="$(just get-worker-node-id)"
     current_dir="$(pwd)"
     ca_key_fullpath="$current_dir/{{ca_key}}"
     ca_cert_fullpath="$current_dir/{{ca_cert}}"
     kubeconfig_fullpath="$current_dir/{{kubeconfig}}"
-    just terraform/day-one $cluster_ip $ca_key_fullpath $ca_cert_fullpath $kubeconfig_fullpath {{host_ip}}
+    just terraform/day-one $cluster_ip $worker_node_id $ca_key_fullpath $ca_cert_fullpath $kubeconfig_fullpath {{host_ip}}
 
 copy-kubeconfig: nodes-up
     mkdir -p .kube
@@ -47,6 +48,26 @@ test_kubernetes_ca:
     ca_cert_fullpath="$current_dir/{{ca_cert}}"
     just terraform/test_kubernetes_ca $ca_key_fullpath $ca_cert_fullpath
 
+lab-dns: apply-lab-dns
+    echo "sudo resolvectl dns virbr1 172.16.122.13 1.1.1.1 8.8.8.8"
+    echo "resolvectl domain virbr1 test-kubernetes"
+
+apply-lab-dns: install-lab-dns
+    #!/usr/bin/env bash
+    cluster_ip="$(just get-cluster-ip)"
+    current_dir="$(pwd)"
+    kubeconfig_fullpath="$current_dir/{{kubeconfig}}"
+    just terraform/lab-dns $cluster_ip $kubeconfig_fullpath
+
+install-lab-dns: build-lab-dns
+    KUBECONFIG={{kubeconfig}} helm upgrade --install --namespace lab-dns --create-namespace --force lab-dns ./workload/lab-dns/chart
+
+uninstall-lab-dns:
+    KUBECONFIG={{kubeconfig}} helm uninstall --namespace lab-dns lab-dns --ignore-not-found
+
+build-lab-dns:
+    just workload/lab-dns/build
+
 # Stop the cluster
 
 down:
@@ -61,17 +82,24 @@ get-cluster-ip:
     #!/usr/bin/env bash
     KUBECONFIG={{kubeconfig}} kubectl get nodes -o jsonpath='{.items[?(@.metadata.name=="control-plane-master")].status.addresses[?(@.type=="InternalIP")].address}'
 
+get-worker-node-id:
+    #!/usr/bin/env bash
+    KUBECONFIG={{kubeconfig}} kubectl get nodes -o jsonpath='{.items[?(@.metadata.name=="worker-node-red")].status.addresses[?(@.type=="InternalIP")].address}'
+
 nodes:
     KUBECONFIG={{kubeconfig}} kubectl get nodes --output=wide
 
 all-pods:
     KUBECONFIG={{kubeconfig}} kubectl get pods --all-namespaces --output=wide
 
-install-hello-world:
+test-hello-world:
+    KUBECONFIG={{kubeconfig}} helm test --namespace hello hello-world
+
+install-hello-world: uninstall-hello-world
     KUBECONFIG={{kubeconfig}} helm install --namespace hello --create-namespace hello-world ./workload/hello-world/chart
 
 uninstall-hello-world:
-    KUBECONFIG={{kubeconfig}} helm uninstall --namespace hello hello-world
+    KUBECONFIG={{kubeconfig}} helm uninstall --namespace hello hello-world --ignore-not-found
 
 lint: ansible-lint terraform-lint
 

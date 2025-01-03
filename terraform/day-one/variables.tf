@@ -3,6 +3,11 @@ variable "cluster_master_ip" {
   type        = string
 }
 
+variable "cluster_worker_node" {
+  description = "The IP address of the Kubernetes first worker node"
+  type        = string
+}
+
 variable "ca_key_file_path" {
   description = "Path to the CA private key file"
   type        = string

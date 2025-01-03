@@ -1,0 +1,13 @@
+[package]
+name = "lab-webhook"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+anyhow = "1.0.95"
+dotenvy = "0.15.7"
+tokio = { version = "1.42.0", features = ["macros", "rt-multi-thread"] }
+tracing = "0.1.41"
+tracing-subscriber = "0.3.19"
+
+srv-lib = { path = "../srv-lib" }

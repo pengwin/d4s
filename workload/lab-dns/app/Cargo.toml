@@ -1,0 +1,11 @@
+[workspace]
+resolver = "2"
+
+members = [
+    "lab-dns",
+    "lab-webhook",
+    "srv-lib",
+    "generated/webhook",
+    "generated/webhook-client",
+    "e2e_tests",
+]

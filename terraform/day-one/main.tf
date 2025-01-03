@@ -19,6 +19,7 @@ module "metallb" {
   release_name  = "metallb"
 
   cluster_master_ip = var.cluster_master_ip
+  cluster_worker_node = var.cluster_worker_node
 
   depends_on = [module.flannel]
 }

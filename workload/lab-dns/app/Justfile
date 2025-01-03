@@ -1,0 +1,39 @@
+build:
+    cargo build --release
+
+run-server:
+    cargo run --bin lab-dns --release
+
+run-webhook:
+    cargo run --bin lab-webhook --release
+
+test:
+    cargo test --release
+
+clean:
+    cargo clean
+
+podman-build:
+    podman-compose build
+
+podman-up: podman-build
+    podman-compose up
+
+docker-push: podman-build
+    docker push docker-registry.test-kubernetes/dns-server:0.0.1
+    docker push docker-registry.test-kubernetes/dns-server-webhook:0.0.1
+
+generate-openapi:
+    docker run --rm \
+        -v .:/local docker.io/openapitools/openapi-generator-cli generate \
+        -i /local/webhook.yaml \
+        -g rust-axum \
+        --additional-properties=packageName=webhook,packageVersion=0.0.1,allowBlockingResponseSerialize=true,allowBlockingValidator=true \
+        -o /local/generated/webhook
+
+    docker run --rm \
+        -v .:/local docker.io/openapitools/openapi-generator-cli generate \
+        -i /local/webhook.yaml \
+        -g rust \
+        --additional-properties=packageName=webhook-client,packageVersion=0.0.1,library=hyper,avoidBoxedModels=true,topLevelApiClient=true \
+        -o /local/generated/webhook-client
