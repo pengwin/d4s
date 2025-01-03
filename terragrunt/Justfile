@@ -1,0 +1,9 @@
+fmt:
+    terragrunt hclfmt
+    terragrunt run-all fmt
+
+apply:
+    TF_LOG=INFO terragrunt run-all apply
+
+destroy:
+    TF_LOG=INFO terragrunt run-all destroy 

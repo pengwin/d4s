@@ -1,7 +1,7 @@
 variable "chart_version" {
   description = "The version of the cert-manager chart to install"
   type        = string
-  default = "1.16.2"
+  default     = "1.16.2"
 }
 
 variable "namespace" {
@@ -22,12 +22,14 @@ variable "cluster_issuer_name" {
   default     = "selfsigned-cluster-issuer"
 }
 
-variable "ca_key_file_path" {
-  description = "Path to the CA private key file"
+variable "ca_key_file_pem" {
+  description = "Content of the CA private key PEM"
   type        = string
+  sensitive   = true
 }
 
-variable "ca_cert_file_path" {
-  description = "Path to the CA certificate file"
+variable "ca_cert_file_pem" {
+  description = "Content of the CA certificate PEM"
   type        = string
+  sensitive   = true
 }

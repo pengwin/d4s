@@ -10,9 +10,6 @@ image:
   pullPolicy: Always
   tag: "0.0.1"
 
-serviceAccount:
-  name: ""
-
 service:
   containerPort: 5000
   dnsPort: 1053

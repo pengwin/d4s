@@ -18,8 +18,8 @@ module "metallb" {
   chart_version = "0.14.9"
   release_name  = "metallb"
 
-  cluster_master_ip = var.cluster_master_ip
-  cluster_worker_node = var.cluster_worker_node
+  cluster_master_ip   = var.cluster_master_ip
+  cluster_worker_node = var.cluster_worker_node_ip
 
   depends_on = [module.flannel]
 }
@@ -58,8 +58,8 @@ module "cert_manager" {
   release_name  = "cert-manager"
 
   cluster_issuer_name = local.cluster_issuer_name
-  ca_cert_file_path = var.ca_cert_file_path
-  ca_key_file_path = var.ca_key_file_path
+  ca_cert_file_pem    = var.ca_cert_file_pem
+  ca_key_file_pem     = var.ca_key_file_pem
 
   depends_on = [module.flannel]
 }
@@ -89,7 +89,7 @@ resource "kubernetes_config_map" "coredns" {
   }
 
   data = {
-    Corefile = <<EOF
+    Corefile           = <<EOF
     .:53 {
         errors
         health {

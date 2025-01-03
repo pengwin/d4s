@@ -1,8 +1,4 @@
-user_name := "vagrant_admin"
-cluster_name := "test-kubernetes"
-fetched_kubeconfig := replace("ansible/fetched/control-plane-master/home/vagrant/${user_name}.conf", "${user_name}", user_name)
 kubeconfig := ".kube/config"
-host_ip := "172.16.122.5"
 
 # CA files
 ca_key := ".certs/ca.key"
@@ -10,7 +6,7 @@ ca_cert := ".certs/ca.crt"
 
 # Start the cluster
 
-up: day-one
+up: terragrunt
     #!/usr/bin/env bash
     cluster_ip="$(just get-cluster-ip)"
     echo "Cluster is up on $cluster_ip."
@@ -21,32 +17,8 @@ up: day-one
     echo "Add ca cert to trusted storage"
     echo "just update-ca-cert"
 
-day-one: copy-kubeconfig
-    #!/usr/bin/env bash
-    cluster_ip="$(just get-cluster-ip)"
-    worker_node_id="$(just get-worker-node-id)"
-    current_dir="$(pwd)"
-    ca_key_fullpath="$current_dir/{{ca_key}}"
-    ca_cert_fullpath="$current_dir/{{ca_cert}}"
-    kubeconfig_fullpath="$current_dir/{{kubeconfig}}"
-    just terraform/day-one $cluster_ip $worker_node_id $ca_key_fullpath $ca_cert_fullpath $kubeconfig_fullpath {{host_ip}}
-
-copy-kubeconfig: nodes-up
-    mkdir -p .kube
-    cp {{fetched_kubeconfig}} {{kubeconfig}}
-
-nodes-up: test_kubernetes_ca lint
-    #!/usr/bin/env bash
-    current_dir="$(pwd)"
-    ca_cert_fullpath="$current_dir/{{ca_cert}}"
-    just vms/kube-vm/vm-up {{user_name}} {{cluster_name}} $ca_cert_fullpath {{host_ip}}
-
-test_kubernetes_ca:
-    #!/usr/bin/env bash
-    current_dir="$(pwd)"
-    ca_key_fullpath="$current_dir/{{ca_key}}"
-    ca_cert_fullpath="$current_dir/{{ca_cert}}"
-    just terraform/test_kubernetes_ca $ca_key_fullpath $ca_cert_fullpath
+terragrunt: 
+    just terragrunt/apply
 
 lab-dns: apply-lab-dns
     echo "sudo resolvectl dns virbr1 172.16.122.13 1.1.1.1 8.8.8.8"
@@ -71,10 +43,17 @@ build-lab-dns:
 # Stop the cluster
 
 down:
-    just vms/kube-vm/clean
-    just terraform/clean
-    just ansible/clean
+    just terragrunt/destroy
     rm -rf .kube
+    rm -rf .certs
+
+# Service targets
+
+update-ca-cert:
+    #!/usr/bin/env bash
+    current_dir="$(pwd)"
+    ca_cert_fullpath="$current_dir/{{ca_cert}}"
+    ansible-playbook --connection=local --ask-become-pass  ansible/local_ca_install_playbook.yaml -e ca_cert_path=$ca_cert_fullpath
 
 # Utility targets
 
@@ -84,7 +63,7 @@ get-cluster-ip:
 
 get-worker-node-id:
     #!/usr/bin/env bash
-    KUBECONFIG={{kubeconfig}} kubectl get nodes -o jsonpath='{.items[?(@.metadata.name=="worker-node-red")].status.addresses[?(@.type=="InternalIP")].address}'
+    KUBECONFIG={{kubeconfig}} kubectl get nodes -o jsonpath='{.items[?(@.metadata.name=="worker-node-1")].status.addresses[?(@.type=="InternalIP")].address}'
 
 nodes:
     KUBECONFIG={{kubeconfig}} kubectl get nodes --output=wide
@@ -115,11 +94,4 @@ cluster-shell:
 docker-login:
     docker login docker-registry.test-kubernetes -u '' -p ''
 
-default_just_command :="just"
-
-update-ca-cert:
-    #!/usr/bin/env bash
-    current_dir="$(pwd)"
-    ca_cert_fullpath="$current_dir/{{ca_cert}}"
-    ansible-playbook --connection=local --ask-become-pass  ansible/local_ca_install_playbook.yaml -e ca_cert_path=$ca_cert_fullpath
 

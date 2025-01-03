@@ -39,8 +39,8 @@ resource "helm_release" "cert-issuers" {
       ca_secret_name      = "ca-cert"
 
       ca_cert = {
-        tls_crt = data.local_file.ca_cert.content
-        tls_key = data.local_file.ca_key.content
+        tls_crt = var.ca_cert_file_pem
+        tls_key = var.ca_key_file_pem
       }
     })
   ]

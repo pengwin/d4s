@@ -99,7 +99,7 @@
     owner: vagrant
     group: vagrant
   vars:
-    server: "{{ machines['control-plane-master'] }}"
+    server: "{{ machines['control-plane-master']['ip'] }}"
     ca: "{{ ca_info.resources[0].data['ca.crt'] | ansible.builtin.b64encode }}"
     cert: "{{ csr_info.resources[0].status.certificate }}"
     key: "{{ user_key.privatekey | ansible.builtin.b64encode }}"

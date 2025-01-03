@@ -1,10 +1,7 @@
 - name: Setup common configuration for kube node
   hosts:
-    - control-plane-master
-    - control-plane-red
-    - control-plane-blue
-    - worker-node-red
-    - worker-node-blue
+    - control-plane-*
+    - worker-node-*
   become: true
   roles:
     - kube_node
@@ -22,8 +19,7 @@
 
 - name: Setup control plane nodes
   hosts:
-    - control-plane-red
-    - control-plane-blue
+    - control-plane-node-*
   become: true
   roles:
     - control_plane_node
@@ -32,8 +28,7 @@
 
 - name: Setup worker nodes
   hosts:
-    - worker-node-red
-    - worker-node-blue
+    - worker-node-*
   become: true
   roles:
     - worker_node

@@ -1,19 +1,25 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
-vms = {
-  "control-plane-master" => "172.16.122.10",
+require 'json'
+
+vms = JSON.parse(ENV["VMS"])
+
+#vms = {
+#  "control-plane-master" => "172.16.122.10",
   #"control-plane-node-1" : "172.16.122.11",
   #"control-plane-node-2" : "172.16.122.12",
-  "worker-node-1" => "172.16.122.13",
+#  "worker-node-1" => "172.16.122.13",
   #"worker-node-2" : "172.16.122.14",
-}
+#}
+
 
 # Load values from env
 cluster_name = ENV["CLUSTER_NAME"]
 host_ip = ENV["HOST_IP"]
 username = ENV["USERNAME"]
-ca_cert_path = ENV["CA_CERT_PATH"]
+ca_cert_pem = ENV["CA_CERT_PEM"]
+ansible_playbook_path = ENV["ANSIBLE_PLAYBOOK_PATH"]
 
 # All Vagrant configuration is done below. The "2" in Vagrant.configure
 # configures the configuration version (we support older styles for
@@ -23,23 +29,28 @@ Vagrant.configure("2") do |config|
   config.vm.box = "centos/stream9"
   config.vm.box_version = "20241216.0"
 
-  config.vm.provider :libvirt do |libvirt|
-    # Enable forwarding of forwarded_port with id 'ssh'.
-    libvirt.forward_ssh_port = true
-    libvirt.graphics_type = "none"
-    libvirt.cpus = 2
-    libvirt.memory = 2048
-  end
-
   network = "vagrant-kube-libvirt"
 
   default_network = "vagrant-libvirt"
 
   counter = 0
 
-  vms.each do |hostname, ip|
+  vms.each do |hostname, vm_config|
+    # vm configuration
+    ip = vm_config['ip']
+    cpus = vm_config['cpus']
+    memory = vm_config['memory']
+
     config.vm.define hostname do |node|
       node.vm.hostname = hostname
+
+      node.vm.provider :libvirt do |libvirt|
+        # Enable forwarding of forwarded_port with id 'ssh'.
+        libvirt.forward_ssh_port = true
+        libvirt.graphics_type = "none"
+        libvirt.cpus = cpus
+        libvirt.memory = memory
+      end
 
       node.vm.network :private_network,
         :ip => ip,
@@ -57,12 +68,12 @@ Vagrant.configure("2") do |config|
         node.vm.provision :ansible do |ansible|
           # Disable default limit to connect to all the machines
           ansible.limit = "all"
-          ansible.playbook = "../../ansible/kubernetes_playbook.yaml"
+          ansible.playbook = ansible_playbook_path
           ansible.extra_vars = {
             "cluster_name": cluster_name,
             "username": username,
             "machines": vms,
-            "ca_cert_path": ca_cert_path,
+            "ca_cert_pem": ca_cert_pem,
           }
           #ansible.verbose = "vv"
         end

@@ -1,7 +1,7 @@
 ---
 - name: Copy ca.pem to machine
   ansible.builtin.copy:
-    src: "{{ ca_cert_path }}"
+    content: "{{ ca_cert_pem }}"
     dest: /etc/pki/ca-trust/source/anchors/test-kubernetes-ca.pem
     owner: root
     group: root

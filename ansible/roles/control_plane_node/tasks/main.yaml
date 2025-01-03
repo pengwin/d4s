@@ -1,6 +1,6 @@
 - name: TCP port 6443 on master is reachable from worker
   ansible.builtin.wait_for:
-    host: "{{ machines['control-plane-master'] }}"
+    host: "{{ machines['control-plane-master']['ip'] }}"
     port: 6443
     timeout: 60
     delay: 1
@@ -13,11 +13,11 @@
     owner: root
     group: root
   vars:
-    control_plane_endpoint: "{{ machines['control-plane-master'] }}:6443"
+    control_plane_endpoint: "{{ machines['control-plane-master']['ip'] }}:6443"
     kube_adm_token: "{{ hostvars['control-plane-master']['control_join_token'] }}"
     discovery_token_ca_cert_hash: "{{ hostvars['control-plane-master']['discovery_token_ca_cert_hash'] }}"
     certificate_key: "{{ hostvars['control-plane-master']['certificate_key'] }}"
-    advertise_address: "{{ machines[inventory_hostname] }}"
+    advertise_address: "{{ machines[inventory_hostname]['ip'] }}"
 
 - name: Join cluster
   ansible.builtin.shell: kubeadm join --config /etc/kubernetes/join.yaml > join.log
