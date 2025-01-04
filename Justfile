@@ -95,4 +95,8 @@ cluster-shell:
 docker-login:
     docker login docker-registry.test-kubernetes -u '' -p ''
 
+argocd-admin:
+    echo "ArgoCD username: admin password:"
+    @KUBECONFIG={{kubeconfig}} kubectl -n argo-cd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d
+
 

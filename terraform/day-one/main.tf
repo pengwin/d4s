@@ -101,6 +101,16 @@ module "external-dns" {
   depends_on = [module.pi_hole]
 }
 
+module "argo-cd" {
+  source = "./modules/argo-cd"
+
+  namespace     = "argo-cd"
+  chart_version = "7.0.0"
+  release_name  = "argo-cd"
+
+  depends_on = [module.ingress_nginx]
+}
+
 import {
   to = kubernetes_config_map.coredns
   id = "kube-system/coredns"
