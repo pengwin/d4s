@@ -19,6 +19,7 @@ cluster_name = ENV["CLUSTER_NAME"]
 host_ip = ENV["HOST_IP"]
 username = ENV["USERNAME"]
 ca_cert_pem = ENV["CA_CERT_PEM"]
+ca_key_pem = ENV["CA_KEY_PEM"]
 ansible_playbook_path = ENV["ANSIBLE_PLAYBOOK_PATH"]
 
 # All Vagrant configuration is done below. The "2" in Vagrant.configure
@@ -74,6 +75,7 @@ Vagrant.configure("2") do |config|
             "username": username,
             "machines": vms,
             "ca_cert_pem": ca_cert_pem,
+            "ca_key_pem": ca_key_pem,
           }
           #ansible.verbose = "vv"
         end

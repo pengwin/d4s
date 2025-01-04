@@ -17,6 +17,12 @@ variable "host_ip" {
   type        = string
 }
 
+variable "ca_key_pem" {
+  description = "The CA certificate key PEM"
+  type        = string
+  sensitive   = true
+}
+
 variable "ca_cert_pem" {
   description = "The CA certificate PEM"
   type        = string

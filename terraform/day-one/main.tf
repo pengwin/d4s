@@ -81,7 +81,6 @@ module "pi_hole" {
   source = "./modules/pi-hole"
 
   namespace     = "pi-hole"
-  chart_version = "0.0.1"
   release_name  = "pi-hole"
 
   pi_hole_password = var.pi_hole_password
@@ -117,6 +116,8 @@ module "metrics-server" {
   namespace     = "metrics-server"
   chart_version = "3.12.2"
   release_name  = "metrics-server"
+
+  cluster_issuer_name = local.cluster_issuer_name
 
   depends_on = [module.cert_manager]
 }

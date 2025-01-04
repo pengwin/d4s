@@ -24,9 +24,32 @@
     certificate_key: "{{ aes_key.stdout }}"
     advertise_address: "{{ machines[inventory_hostname]['ip'] }}"
 
+- name: Create pki dir
+  ansible.builtin.file:
+    path: /etc/kubernetes/pki/
+    state: directory
+    owner: root
+    group: root
+    mode: "0644"
+
+- name: Copy ca.crt
+  ansible.builtin.copy:
+    content: "{{ ca_cert_pem }}"
+    dest: /etc/kubernetes/pki/ca.crt
+    owner: root
+    group: root
+    mode: "0644"
+
+- name: Copy ca.key
+  ansible.builtin.copy:
+    content: "{{ ca_key_pem }}"
+    dest: /etc/kubernetes/pki/ca.key
+    owner: root
+    group: root
+    mode: "0600"
+
 - name: Populate service facts
   ansible.builtin.service_facts:
-
 
 - name: Initialize the cluster (this could take some time)
   ansible.builtin.shell: kubeadm init --config /etc/kubernetes/kubeadm-config.yaml --upload-certs --v=5 > cluster_initialized.log

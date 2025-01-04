@@ -16,6 +16,7 @@ resource "vagrant_vm" "k8s_vms" {
     HOST_IP      = var.host_ip
     USERNAME     = local.admin_username
     CA_CERT_PEM  = var.ca_cert_pem
+    CA_KEY_PEM   = var.ca_key_pem
     VMS          = local.vms_json
 
     ANSIBLE_PLAYBOOK_PATH = local.ansible_playbook_path

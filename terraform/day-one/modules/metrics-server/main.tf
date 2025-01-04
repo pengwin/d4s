@@ -14,16 +14,24 @@ resource "helm_release" "metrics-server" {
 
   values = [
     yamlencode({
-      #apiService = {
-      #  insecureSkipTLSVerify = false
-      #}
+      // uncomment on future releases of metrics-server
+      /*apiService = {
+        insecureSkipTLSVerify = false
+      }
 
-      #tls = {
-      #  type = "helm"
-      #}
+      tls = {
+        type = "cert-manager"
+        certManager = {
+          existingIssuer = {
+            enabled = true
+            kind    = "ClusterIssuer"
+            name    = var.cluster_issuer_name
+          }
+        }
+      }*/
 
       args = [
-        "--kubelet-insecure-tls"
+        "--kubelet-insecure-tls" # Required for self-signed certificates
       ]
     })
   ]

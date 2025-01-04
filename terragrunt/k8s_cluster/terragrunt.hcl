@@ -16,6 +16,7 @@ inputs = {
   ansible_base_path = "${get_terragrunt_dir()}/../../ansible"
 
   ca_cert_pem = dependency.ca_cert.outputs.ca_cert
+  ca_key_pem  = dependency.ca_cert.outputs.ca_key
 
   vms = {
     control-plane-master = {

@@ -15,3 +15,8 @@ variable "release_name" {
   type        = string
   default     = "metrics-server"
 }
+
+variable "cluster_issuer_name" {
+  description = "The name of the cluster issuer"
+  type        = string
+}
