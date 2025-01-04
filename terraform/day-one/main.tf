@@ -111,6 +111,16 @@ module "argo-cd" {
   depends_on = [module.ingress_nginx]
 }
 
+module "metrics-server" {
+  source = "./modules/metrics-server"
+
+  namespace     = "metrics-server"
+  chart_version = "3.12.2"
+  release_name  = "metrics-server"
+
+  depends_on = [module.cert_manager]
+}
+
 import {
   to = kubernetes_config_map.coredns
   id = "kube-system/coredns"
