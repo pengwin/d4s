@@ -75,7 +75,10 @@ all-pods:
 test-hello-world:
     KUBECONFIG={{kubeconfig}} helm test --namespace hello hello-world
 
-install-hello-world: uninstall-hello-world
+push-hello-world-container:
+    just workload/hello-world/app/docker-push
+
+install-hello-world: push-hello-world-container uninstall-hello-world
     KUBECONFIG={{kubeconfig}} helm install --namespace hello --create-namespace hello-world ./workload/hello-world/chart
 
 uninstall-hello-world:
@@ -98,5 +101,17 @@ docker-login:
 argocd-admin:
     echo "ArgoCD username: admin password:"
     @KUBECONFIG={{kubeconfig}} kubectl -n argo-cd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d
+
+gitea-admin:
+    @echo "Gitea username:"
+    @KUBECONFIG={{kubeconfig}} kubectl -n gitea get secret gitea-admin -o jsonpath="{.data.username}" | base64 -d
+    @echo ""
+    @echo "Gitea password:"
+    @KUBECONFIG={{kubeconfig}} kubectl -n gitea get secret gitea-admin -o jsonpath="{.data.password}" | base64 -d
+
+
+gitea-repo:
+    @just terragrunt/print-sensitive ./gitea_setup hello_world_deploy_clone_url
+
 
 

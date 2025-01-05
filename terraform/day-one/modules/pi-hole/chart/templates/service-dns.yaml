@@ -5,7 +5,7 @@ metadata:
   labels:
     {{- include "chart.labels" . | nindent 4 }}
   annotations:
-    metallb.ip/allow-shared-ip: {{ .Values.service.allowSharedIP }}
+    metallb.io/allow-shared-ip: {{ .Values.service.allowSharedIP }}
 spec:
   type: LoadBalancer
   ports:

@@ -30,8 +30,7 @@ dependency "k8s_cluster" {
 }
 
 inputs = {
-  cluster_master_ip      = dependency.k8s_cluster.outputs.vms["control-plane-master"]
-  cluster_worker_node_ip = dependency.k8s_cluster.outputs.vms["worker-node-1"]
+  cluster_nodes          = dependency.k8s_cluster.outputs.vms
   ca_key_file_pem        = dependency.ca_cert.outputs.ca_key
   ca_cert_file_pem       = dependency.ca_cert.outputs.ca_cert
   kubeconfig_file_path   = dependency.k8s_cluster.outputs.k8s_admin_conf_path

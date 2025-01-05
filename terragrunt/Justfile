@@ -5,8 +5,12 @@ fmt:
 init:
     terragrunt run-all init
 
+# prepend TF_LOG=INFO to see the logs
 apply: init
-    TF_LOG=INFO terragrunt run-all apply
+    terragrunt run-all apply
 
 destroy:
     TF_LOG=INFO terragrunt run-all destroy 
+
+print-sensitive module sensitive:
+    @terragrunt output --terragrunt-working-dir {{module}} {{sensitive}}

@@ -16,6 +16,10 @@ resource "helm_release" "csi-driver-nfs" {
           type = "NodePort"
         }
       }
+
+      feature = {
+        enableFSGroupPolicy = false
+      }
     })
   ]
 }
@@ -26,8 +30,9 @@ resource "kubernetes_storage_class" "nfs" {
   }
 
   parameters = {
-    server = var.nfs_server.server
-    share  = var.nfs_server.share
+    server           = var.nfs_server.server
+    share            = var.nfs_server.share
+    mountPermissions = "0777"
   }
 
   storage_provisioner = "nfs.csi.k8s.io"

@@ -29,6 +29,11 @@ inputs = {
       cpus   = 2
       memory = 2048
     }
+    worker-node-2 = {
+      ip     = "172.16.122.14"
+      cpus   = 2
+      memory = 2048
+    }
   }
 
 }

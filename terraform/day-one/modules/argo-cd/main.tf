@@ -31,6 +31,7 @@ resource "helm_release" "argo-cd" {
           annotations = {
             "nginx.ingress.kubernetes.io/force-ssl-redirect" = "false"
             "nginx.ingress.kubernetes.io/backend-protocol"   = "HTTP"
+            "cert-manager.io/cluster-issuer"                 = var.cluster_issuer_name
           }
 
           tls = true

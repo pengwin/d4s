@@ -15,7 +15,7 @@ resource "helm_release" "nginx_ingress" {
           kind = "daemonset"
           type = "LoadBalancer"
           annotations = {
-            "metallb.ip/allow-shared-ip" = "nginx"
+            "metallb.io/allow-shared-ip" = "nginx"
           }
         }
       }

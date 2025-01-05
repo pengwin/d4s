@@ -63,8 +63,8 @@ ansible-galaxy collection install kubernetes.core
 ```
 sudo apt install nfs-kernel-server
 sudo mkdir -p /srv/nfs/k8s_csi
-sudo chmod 755 /srv/nfs/k8s_csi
-sudo chown nobody:nogroup /srv/nfs/shark8s_csi
+sudo chmod 777 /srv/nfs/k8s_csi
+sudo chown nobody:nogroup /srv/nfs/k8s_csi
 ```
 Add to /etc/exports
 ```

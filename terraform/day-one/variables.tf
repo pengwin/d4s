@@ -1,12 +1,8 @@
-variable "cluster_master_ip" {
-  description = "The IP address of the Kubernetes master node"
-  type        = string
+variable "cluster_nodes" {
+  description = "The map of nodes of cluster"
+  type        = map(string)
 }
 
-variable "cluster_worker_node_ip" {
-  description = "The IP address of the Kubernetes first worker node"
-  type        = string
-}
 
 variable "ca_key_file_pem" {
   description = "Content of the CA private key PEM"

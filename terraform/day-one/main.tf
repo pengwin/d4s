@@ -1,6 +1,14 @@
 locals {
   storage_class_name  = "nfs-storage-class"
   cluster_issuer_name = "selfsigned-cluster-issuer"
+  master_ip           = var.cluster_nodes["control-plane-master"]
+
+  gitea_admin_secret_name = "gitea-admin"
+  gitea_domain            = "gitea.test-kubernetes"
+  gitea_namespace         = "gitea"
+
+  argocd_domain    = "argocd.test-kubernetes"
+  argocd_namespace = "argo-cd"
 }
 
 module "flannel" {
@@ -18,8 +26,7 @@ module "metallb" {
   chart_version = "0.14.9"
   release_name  = "metallb"
 
-  cluster_master_ip   = var.cluster_master_ip
-  cluster_worker_node = var.cluster_worker_node_ip
+  ips = [for k, v in var.cluster_nodes : v]
 
   depends_on = [module.flannel]
 }
@@ -80,8 +87,8 @@ module "docker-registry" {
 module "pi_hole" {
   source = "./modules/pi-hole"
 
-  namespace     = "pi-hole"
-  release_name  = "pi-hole"
+  namespace    = "pi-hole"
+  release_name = "pi-hole"
 
   pi_hole_password = var.pi_hole_password
 
@@ -103,9 +110,13 @@ module "external-dns" {
 module "argo-cd" {
   source = "./modules/argo-cd"
 
-  namespace     = "argo-cd"
+  namespace     = local.argocd_namespace
   chart_version = "7.0.0"
   release_name  = "argo-cd"
+
+  argo_domain = local.argocd_domain
+
+  cluster_issuer_name = local.cluster_issuer_name
 
   depends_on = [module.ingress_nginx]
 }
@@ -120,6 +131,22 @@ module "metrics-server" {
   cluster_issuer_name = local.cluster_issuer_name
 
   depends_on = [module.cert_manager]
+}
+
+module "gitea" {
+  source = "./modules/gitea"
+
+  namespace     = local.gitea_namespace
+  chart_version = "10.6.0"
+  release_name  = "gitea"
+
+  gitea_domain        = local.gitea_domain
+  storage_class_name  = local.storage_class_name
+  cluster_issuer_name = local.cluster_issuer_name
+
+  gitea_admin_secret_name = local.gitea_admin_secret_name
+
+  depends_on = [module.ingress_nginx]
 }
 
 import {
@@ -162,7 +189,8 @@ resource "kubernetes_config_map" "coredns" {
     test_kubernetes_db = <<EOF
     # This is a custom domain file for CoreDNS
     # Format: <IP> <DOMAIN>
-    ${var.cluster_master_ip} docker-registry.test-kubernetes
+    ${local.master_ip} docker-registry.test-kubernetes
+    ${local.master_ip} gitea.test-kubernetes
     EOF
   }
 

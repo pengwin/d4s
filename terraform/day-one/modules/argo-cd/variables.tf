@@ -21,3 +21,8 @@ variable "argo_domain" {
   type        = string
   default     = "argocd.test-kubernetes"
 }
+
+variable "cluster_issuer_name" {
+  description = "The name of the cert-manager cluster issuer"
+  type        = string
+}
