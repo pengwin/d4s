@@ -4,3 +4,11 @@ provider "gitea" {
   password = var.gitea_admin_password
   insecure = true
 }
+
+provider "git" {
+  
+}
+
+provider "local" {
+  
+}

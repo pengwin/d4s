@@ -27,14 +27,6 @@ resource "argocd_project" "hello-world" {
   }
 }
 
-resource "argocd_repository" "hello_world_deploy" {
-  repo            = var.hello_world_deploy_ssh
-  project         = local.project_name
-  username        = "git"
-  ssh_private_key = var.argocd_deploy_private_key
-  insecure        = true
-}
-
 resource "argocd_application" "hello_world" {
   metadata {
     name = local.app_name
@@ -73,6 +65,20 @@ resource "argocd_application" "hello_world" {
       }
     }
   }
+
+  depends_on = [argocd_project.hello-world]
 }
+
+
+
+resource "argocd_repository" "hello_world_deploy" {
+  repo            = var.hello_world_deploy_ssh
+  project         = local.project_name
+  username        = "git"
+  ssh_private_key = var.argocd_deploy_private_key
+  insecure        = true
+}
+
+
 
 

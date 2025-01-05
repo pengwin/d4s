@@ -5,12 +5,22 @@ fmt:
 init:
     terragrunt run-all init
 
+refresh: init
+    terragrunt run-all refresh
+
 # prepend TF_LOG=INFO to see the logs
 apply: init
     terragrunt run-all apply
 
 destroy:
-    TF_LOG=INFO terragrunt run-all destroy 
+    TF_LOG=INFO terragrunt run-all destroy
+
+clean:
+    terragrunt --terragrunt-working-dir ./k8s_cluster destroy
+    rm -v ./**/.terraform.lock.hcl
+    rm -v -rf ./**/.terragrunt-cache
+    rm -v -rf ./**/.terraform
+    
 
 print-sensitive module sensitive:
     @terragrunt output --terragrunt-working-dir {{module}} {{sensitive}}

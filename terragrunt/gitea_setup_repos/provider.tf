@@ -1,0 +1,7 @@
+provider "git" {
+  
+}
+
+provider "local" {
+  
+}

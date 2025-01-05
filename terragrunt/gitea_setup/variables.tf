@@ -12,3 +12,8 @@ variable "gitea_admin_password" {
   description = "The password of the gitea admin"
   type        = string
 }
+
+variable "repo_path" {
+  description = "The path to the repository"
+  type = string
+}

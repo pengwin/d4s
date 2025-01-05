@@ -1,3 +1,7 @@
+terraform {
+  source = "."
+}
+
 include "env" {
   path   = find_in_parent_folders("env.hcl")
   expose = true
@@ -20,8 +24,10 @@ dependency "day_one" {
   }
 }
 
+
 inputs = {
   gitea_admin_username = dependency.extract_creds.outputs.gitea_username
   gitea_admin_password = dependency.extract_creds.outputs.gitea_password
   gitea_domain = dependency.day_one.outputs.gitea_domain
+  repo_path = get_working_dir()
 }

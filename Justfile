@@ -44,8 +44,12 @@ build-lab-dns:
 
 down:
     just terragrunt/destroy
-    rm -rf .kube
-    rm -rf .certs
+
+clean:
+    just terragrunt/clean
+    just ansible/clean
+    rm -v -rf ./.kube
+    rm -v -rf ./.certs
 
 # Service targets
 

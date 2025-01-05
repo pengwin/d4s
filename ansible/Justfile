@@ -2,4 +2,4 @@ lint:
     ansible-lint
 
 clean:
-    rm -rf fetched
+    rm -v -rf ./fetched

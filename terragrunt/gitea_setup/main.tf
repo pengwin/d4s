@@ -1,5 +1,8 @@
 locals {
-  username = "hello"
+  username       = "hello"
+  repo_dir       = "${var.repo_path}/hello-world-deploy"
+  default_branch = "master"
+  push_url       = "https://${local.username}:${urlencode(random_password.user_password.result)}@${var.gitea_domain}/${gitea_org.hello_world_org.name}/${gitea_repository.hello_world_deploy.name}.git"
 }
 
 resource "gitea_org" "hello_world_org" {
@@ -21,10 +24,11 @@ resource "gitea_user" "user" {
 }
 
 resource "gitea_repository" "hello_world_deploy" {
-  username  = gitea_org.hello_world_org.name
-  name      = "hello-world-deploy"
-  private   = true
-  auto_init = false
+  username       = gitea_org.hello_world_org.name
+  name           = "hello-world-deploy"
+  private        = true
+  auto_init      = false
+  default_branch = local.default_branch
 }
 
 resource "tls_private_key" "hello_world_deploy" {
@@ -32,7 +36,7 @@ resource "tls_private_key" "hello_world_deploy" {
   rsa_bits  = 4096
 }
 
-resource "gitea_repository_key" "argocd_deploy_key" {
+resource "gitea_repository_key" "hello_world_argocd_deploy_key" {
   repository = gitea_repository.hello_world_deploy.id
   title      = "ARGO CD deploy key"
   read_only  = true
@@ -49,7 +53,12 @@ output "hello_world_deploy_ssh" {
 }
 
 output "hello_world_deploy_clone_url" {
-  value = "https://${local.username}:${urlencode(random_password.user_password.result)}@${var.gitea_domain}/${gitea_org.hello_world_org.name}/${gitea_repository.hello_world_deploy.name}.git"
+  value     = "https://${local.username}:${urlencode(random_password.user_password.result)}@${var.gitea_domain}/${gitea_org.hello_world_org.name}/${gitea_repository.hello_world_deploy.name}.git"
+  sensitive = true
+}
+
+output "hello_world_deploy_push_url" {
+  value     = local.push_url
   sensitive = true
 }
 
@@ -66,8 +75,3 @@ resource "gitea_team_members" "hello_world_team_members" {
   team_id = gitea_team.hello_world_team.id
   members = [gitea_user.user.username]
 }
-
-
-
-
-

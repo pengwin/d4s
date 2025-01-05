@@ -1,3 +1,8 @@
+terraform {
+  source = "."
+}
+
+
 include "env" {
   path   = find_in_parent_folders("env.hcl")
   expose = true
@@ -32,6 +37,12 @@ dependency "gitea_setup" {
     hello_world_deploy_ssh = "mock hello world deploy ssh"
     argocd_deploy_private_key = "mock argocd deploy private key"
   }
+}
+
+dependency "gitea_setup_repos" {
+  config_path = "../gitea_setup_repos"
+
+  skip_outputs = true
 }
 
 
