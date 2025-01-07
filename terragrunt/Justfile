@@ -10,16 +10,15 @@ refresh: init
 
 # prepend TF_LOG=INFO to see the logs
 apply: init
-    terragrunt run-all apply
+    TF_LOG=INFO terragrunt run-all apply
 
 destroy:
     TF_LOG=INFO terragrunt run-all destroy
 
 clean:
-    terragrunt --terragrunt-working-dir ./k8s_cluster destroy
-    rm -v ./**/.terraform.lock.hcl
-    rm -v -rf ./**/.terragrunt-cache
-    rm -v -rf ./**/.terraform
+    terragrunt --terragrunt-working-dir ./k8s-cluster destroy
+    find . -type d -name ".terragrunt-cache" -prune -exec /bin/rm -v -rf '{}' \;
+    find . -name ".terraform.lock.hcl" -exec /bin/rm -v '{}' \;
     
 
 print-sensitive module sensitive:

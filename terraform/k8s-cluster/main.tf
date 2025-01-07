@@ -1,5 +1,4 @@
 locals {
-  cluster_name   = "test-kubernetes"
   admin_username = "vagrant_admin"
 
   k8s_playbook_file   = "kubernetes_playbook.yaml"
@@ -10,9 +9,9 @@ locals {
 }
 
 resource "vagrant_vm" "k8s_vms" {
-  name = "${local.cluster_name}-vms"
+  name = "${var.cluster_name}-vms"
   env = {
-    CLUSTER_NAME = local.cluster_name
+    CLUSTER_NAME = var.cluster_name
     HOST_IP      = var.host_ip
     USERNAME     = local.admin_username
     CA_CERT_PEM  = var.ca_cert_pem
@@ -25,4 +24,11 @@ resource "vagrant_vm" "k8s_vms" {
     VAGRANTFILE_HASH = md5(file("./Vagrantfile"))
   }
   get_ports = false
+}
+
+resource "local_sensitive_file" "kube_conf" {
+  source   = local.k8s_admin_conf_path
+  filename = var.kubeconfig_file_path
+
+  depends_on = [vagrant_vm.k8s_vms]
 }

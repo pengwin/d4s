@@ -1,2 +1,5 @@
 provider "vagrant" {
 }
+
+provider "local" {
+}

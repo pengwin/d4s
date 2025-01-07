@@ -1,0 +1,63 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "chart.fullname" . }}
+  labels:
+    {{- include "chart.labels" . | nindent 4 }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "chart.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/component: WebApi
+        {{- include "chart.labels" . | nindent 8 }}
+    spec:
+      #imagePullSecrets:
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.service.containerPort }}
+              protocol: TCP
+            - name: dns
+              containerPort: 53
+              protocol: UDP
+          livenessProbe:
+            exec:
+              command:
+                - nslookup
+                - -po=53
+                - cloudflare.com
+                - "127.0.0.1"
+            initialDelaySeconds: 40
+            failureThreshold: 5
+            timeoutSeconds: 20
+          env:
+            - name: PIHOLE_HOSTNAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+            - name: DNSMASQ_LISTENING
+              value: "all"
+            - name: WEB_PORT
+              value: "{{ .Values.service.containerPort }}"
+            - name: WEBPASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.web_password_secret_name }}
+                  key: password
+            - name: FTLCONF_DEBUG_ALL
+              value: "true"
+              
+          resources:
+            limits:
+              cpu: 100m
+              memory: 128Mi
+            requests:
+              cpu: 100m
+              memory: 128Mi

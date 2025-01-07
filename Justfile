@@ -17,7 +17,7 @@ up: terragrunt
     echo "Add ca cert to trusted storage"
     echo "just update-ca-cert"
 
-terragrunt: 
+terragrunt: fmt
     just terragrunt/apply
 
 lab-dns: apply-lab-dns
@@ -60,6 +60,9 @@ update-ca-cert:
     ansible-playbook --connection=local --ask-become-pass  ansible/local_ca_install_playbook.yaml -e ca_cert_path=$ca_cert_fullpath
     diff $ca_cert_fullpath /etc/ssl/certs/test-cluster-ca.pem
 
+docker-login:
+    docker login docker-registry.test-kubernetes -u '' -p ''
+
 # Utility targets
 
 get-cluster-ip:
@@ -90,6 +93,9 @@ uninstall-hello-world:
 
 lint: ansible-lint terraform-lint
 
+fmt:
+    just terragrunt/fmt
+
 ansible-lint:
     just ansible/lint
 
@@ -99,8 +105,6 @@ terraform-lint:
 cluster-shell:
     KUBECONFIG={{kubeconfig}} kubectl run -i --tty --rm just-shell --image=docker.io/library/alpine:3.21 --restart=Never -- /bin/sh
 
-docker-login:
-    docker login docker-registry.test-kubernetes -u '' -p ''
 
 argocd-admin:
     echo "ArgoCD username: admin password:"
@@ -113,9 +117,13 @@ gitea-admin:
     @echo "Gitea password:"
     @KUBECONFIG={{kubeconfig}} kubectl -n gitea get secret gitea-admin -o jsonpath="{.data.password}" | base64 -d
 
+pi-hole-admin:
+    @echo "Pi-hole password:"
+    @KUBECONFIG={{kubeconfig}} kubectl -n external-dns get secret pi-hole-web-password -o jsonpath="{.data.password}" | base64 -d
 
 gitea-repo:
     @just terragrunt/print-sensitive ./gitea_setup hello_world_deploy_clone_url
+    
 
 
 

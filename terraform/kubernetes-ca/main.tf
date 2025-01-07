@@ -25,3 +25,13 @@ resource "tls_self_signed_cert" "ca_cert" {
     "crl_signing"
   ]
 }
+
+resource "local_file" "ca_cert" {
+  content  = tls_self_signed_cert.ca_cert.cert_pem
+  filename = var.cert_file_path
+}
+
+resource "local_file" "ca_key" {
+  content  = tls_private_key.ca_private_key.private_key_pem
+  filename = var.key_file_path
+}

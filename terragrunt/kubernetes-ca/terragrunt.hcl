@@ -13,4 +13,7 @@ inputs = {
   city                  = "Belgrade"
   company               = "Test K8S"
   validity_period_hours = 24 * 365
+
+  key_file_path  = include.env.locals.ca_key_file_path
+  cert_file_path = include.env.locals.ca_cert_file_path
 }

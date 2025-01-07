@@ -1,6 +1,0 @@
-cluster_issuer_name: ca-cluster-issuer
-ca_secret_name: ca-cert
-
-ca_cert: {}
-  #tls_crt:
-  #tls_key:

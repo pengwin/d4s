@@ -1,3 +1,8 @@
+variable "cluster_name" {
+  description = "The name of the Kubernetes cluster"
+  type        = string
+}
+
 variable "vms" {
   description = "The configuration of the Kubernetes cluster VMs"
   type = map(object({
@@ -27,4 +32,9 @@ variable "ca_cert_pem" {
   description = "The CA certificate PEM"
   type        = string
   sensitive   = true
+}
+
+variable "kubeconfig_file_path" {
+  description = "Path to save the kubeconfig file"
+  type        = string
 }
