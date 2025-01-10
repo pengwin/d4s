@@ -1,0 +1,23 @@
+install:
+    terraform init 
+
+plan:
+    terraform plan
+
+apply cluster_master_ip kubeconfig_file_path: install
+    #!/usr/bin/env bash
+    terraform apply --auto-approve \
+    -var "cluster_master_ip={{cluster_master_ip}}" \
+    -var "kubeconfig_file_path={{kubeconfig_file_path}}" 
+
+destroy: install
+    terraform destroy
+
+lint:
+    docker run --rm -v $(pwd):/data -t ghcr.io/terraform-linters/tflint --recursive --minimum-failure-severity=warning
+
+clean:
+    rm -rf .terraform
+    rm -rf .terraform.lock.hcl
+    rm -rf terraform.tfstate
+    rm -rf terraform.tfstate.backup
