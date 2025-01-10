@@ -1,2 +1,0 @@
-build:
-    just app/docker-push
