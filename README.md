@@ -77,6 +77,11 @@ sudo systemctl enable nfs-kernel-server
 ```
 12. [Terragrunt](https://terragrunt.gruntwork.io/docs/getting-started/install/)
 
+13. Install libnss-tools to provision ca cert to google chrome
+```
+sudo apt-get install libnss3-tools`
+```
+
 # Usage
 1. Provision vagrant nodes
 ```

@@ -7,8 +7,8 @@ terraform {
   source = "../../../../terraform/base-helm"
 }
 
-dependency "cni-flannel" {
-  config_path  = "../cni-flannel"
+dependency "cni-calico" {
+  config_path  = "../cni-calico"
   skip_outputs = true
 }
 

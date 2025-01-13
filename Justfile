@@ -14,8 +14,10 @@ up: terragrunt
     echo "export KUBECONFIG={{kubeconfig}}"
     echo "To access the docker registry, add the following line to /etc/hosts:"
     echo "$cluster_ip docker-registry.test-kubernetes"
-    echo "Add ca cert to trusted storage"
+    echo "Add CA cert to trusted storage"
     echo "just update-ca-cert"
+    echo "Add CA cert to chrome"
+    echo "just update-chrome-certs"
 
 terragrunt: fmt
     just terragrunt/apply
@@ -51,6 +53,9 @@ clean:
     rm -v -rf ./.kube
     rm -v -rf ./.certs
 
+delete-pvc:
+    sudo rm -rf /srv/nfs/k8s_csi/pvc-*
+
 # Service targets
 
 update-ca-cert:
@@ -62,6 +67,9 @@ update-ca-cert:
 
 docker-login:
     docker login docker-registry.test-kubernetes -u '' -p ''
+    
+update-chrome-certs:
+    certutil -d sql:$HOME/.pki/nssdb -A -t TC -n "test-kubernetes" -i .certs/ca.crt
 
 # Utility targets
 
@@ -90,6 +98,12 @@ install-hello-world: push-hello-world-container uninstall-hello-world
 
 uninstall-hello-world:
     KUBECONFIG={{kubeconfig}} helm uninstall --namespace hello hello-world --ignore-not-found
+
+prepare-hello-world-repo:
+    #!/usr/bin/env bash
+    chart_repo="$(find ./terragrunt/k8s/workload/gitea-create-repos/ -type d -name 'hello-world-deploy')"
+    cp -rv ./workload/hello-world/chart/* $chart_repo
+    code $chart_repo
 
 lint: ansible-lint terraform-lint
 

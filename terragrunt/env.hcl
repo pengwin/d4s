@@ -8,6 +8,7 @@ locals {
       control-plane-master = "172.16.122.10"
       worker-node-1        = "172.16.122.13"
       worker-node-2        = "172.16.122.14"
+      worker-node-3        = "172.16.122.15"
     }
   }
 
