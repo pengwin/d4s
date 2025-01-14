@@ -16,7 +16,7 @@ locals {
     ip            = vm_ip
     cpus          = 2
     memory        = 2048
-    vdisk_size_gb = 15
+    vdisk_size_gb = 20 # GB
   } }
 
   vms_json = urlencode(jsonencode(local.vms))

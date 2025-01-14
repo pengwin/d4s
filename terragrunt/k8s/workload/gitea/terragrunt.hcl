@@ -23,6 +23,14 @@ dependency "ingress-nginx" {
   skip_outputs = true
 }
 
+dependency "gitea-pg" {
+  config_path = "../gitea-pg"
+
+  mock_outputs = {
+    password = "mocked"
+  }
+}
+
 locals {
   namespace               = "gitea"
   gitea_admin_secret_name = "gitea-admin"
@@ -39,12 +47,6 @@ resource "random_password" "gitea_admin_password" {
   special = true
 }
 
-resource "kubernetes_namespace" "gitea" {
-  metadata {
-    name = "${local.namespace}"
-  }
-}
-
 resource "kubernetes_secret" "gitea_admin" {
   metadata {
     name      = "${local.gitea_admin_secret_name}"
@@ -58,8 +60,6 @@ resource "kubernetes_secret" "gitea_admin" {
     password = random_password.gitea_admin_password.result
     email    = "${local.admin_email}"
   }
-
-  depends_on = [kubernetes_namespace.gitea]
 }
 
 output "gitea_admin_username" {
@@ -92,6 +92,16 @@ inputs = {
         existingSecret = local.gitea_admin_secret_name
         email          = local.admin_email
         passwordMode   = "keepUpdated"
+      }
+      config = {
+        database = {
+          DB_TYPE = "postgres"
+          HOST    = "${dependency.gitea-pg.inputs.name}-rw:5432"
+          NAME    = "${dependency.gitea-pg.inputs.database}"
+          USER    = "${dependency.gitea-pg.inputs.username}"
+          PASSWD  = "${dependency.gitea-pg.outputs.password}"
+          SCHEMA  = "public"
+        }
       }
     }
 
@@ -147,7 +157,7 @@ inputs = {
     }
 
     postgresql = {
-      enabled = true
+      enabled = false
     }
   }
 }

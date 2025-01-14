@@ -1,0 +1,22 @@
+---
+- name: Check OS version
+  ansible.builtin.fail:
+    msg: "OS should be Centos 9, not {{ ansible_distribution }} {{ ansible_distribution_version }}"
+  when: ansible_distribution != 'CentOS' or ansible_distribution_version != '9'
+
+- name: Install growpart
+  ansible.builtin.dnf:
+    name: "cloud-utils-growpart"
+    state: present
+    update_cache: true
+
+- name: Grow the partition
+  ansible.builtin.command: growpart /dev/vda 1
+  register: growpart_result
+  failed_when: growpart_result.rc != 0 and 'No space left on device' not in growpart_result.stderr
+  changed_when: false
+
+- name: Resize the filesystem
+  ansible.builtin.command: resize2fs /dev/vda1
+  failed_when: false
+  changed_when: false

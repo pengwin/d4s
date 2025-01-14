@@ -1,3 +1,5 @@
+- name: Grow the partition
+  ansible.builtin.import_tasks: ./grow_partition.yaml
 - name: Configure linux
   ansible.builtin.import_tasks: ./configure_linux.yaml
 - name: Install CA
