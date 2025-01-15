@@ -1,5 +1,5 @@
 locals {
-  secret_name = "${var.name}-user"
+  secret_name = "${var.name}-auth"
 }
 
 resource "random_password" "password" {

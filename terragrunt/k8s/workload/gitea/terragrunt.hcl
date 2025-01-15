@@ -7,6 +7,10 @@ terraform {
   source = "../../../../terraform/base-helm"
 }
 
+dependency "gitea-ns" {
+  config_path  = "../gitea-ns"
+  skip_outputs = true
+}
 
 dependency "nfs-storage-class" {
   config_path  = "../../system/nfs-storage-class"
@@ -32,7 +36,6 @@ dependency "gitea-pg" {
 }
 
 locals {
-  namespace               = "gitea"
   gitea_admin_secret_name = "gitea-admin"
   admin_username          = "k8s_admin"
   admin_email             = "k8s_admin@${include.root.locals.env.gitea_domain}"
@@ -50,7 +53,7 @@ resource "random_password" "gitea_admin_password" {
 resource "kubernetes_secret" "gitea_admin" {
   metadata {
     name      = "${local.gitea_admin_secret_name}"
-    namespace = "${local.namespace}"
+    namespace = "${dependency.gitea-ns.inputs.name}"
   }
 
   type = "Opaque"
@@ -78,7 +81,7 @@ inputs = {
   repository       = "https://dl.gitea.com/charts/"
   chart            = "gitea"
   chart_version    = "10.6.0"
-  namespace        = local.namespace
+  namespace        = dependency.gitea-ns.inputs.name
   release_name     = "gitea"
   create_namespace = false
 
@@ -103,6 +106,16 @@ inputs = {
           SCHEMA  = "public"
         }
       }
+      additionalConfigFromEnvs = [
+        {
+          name  = "GITEA__CACHE__ADAPTER"
+          value = "memory"
+        },
+        {
+          name  = "GITEA__CACHE__INTERVAL"
+          value = "60"
+        }
+      ]
     }
 
     service = {
@@ -153,7 +166,7 @@ inputs = {
     }
 
     redis = {
-      enabled = true
+      enabled = false
     }
 
     postgresql = {
