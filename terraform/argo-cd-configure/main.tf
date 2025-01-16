@@ -69,8 +69,6 @@ resource "argocd_application" "hello_world" {
   depends_on = [argocd_project.hello-world]
 }
 
-
-
 resource "argocd_repository" "hello_world_deploy" {
   repo            = var.hello_world_deploy_ssh
   project         = local.project_name
