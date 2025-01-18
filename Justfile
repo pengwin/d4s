@@ -131,6 +131,13 @@ gitea-admin:
     @echo "Gitea password:"
     @KUBECONFIG={{kubeconfig}} kubectl -n gitea get secret gitea-admin -o jsonpath="{.data.password}" | base64 -d
 
+grafana-admin:
+    @echo "Grafana username:"
+    @KUBECONFIG={{kubeconfig}} kubectl -n grafana get secret grafana-admin -o jsonpath="{.data.username}" | base64 -d
+    @echo ""
+    @echo "Grafana password:"
+    @KUBECONFIG={{kubeconfig}} kubectl -n grafana get secret grafana-admin -o jsonpath="{.data.password}" | base64 -d
+
 pi-hole-admin:
     @echo "Pi-hole password:"
     @KUBECONFIG={{kubeconfig}} kubectl -n external-dns get secret pi-hole-web-password -o jsonpath="{.data.password}" | base64 -d
