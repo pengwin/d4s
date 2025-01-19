@@ -47,6 +47,7 @@ generate "gitea_admin_secret" {
   contents  = <<EOF
 resource "random_password" "gitea_admin_password" {
   length  = 16
+  override_special = "!@#%&*()-_=+[]<>:?"
   special = true
 }
 

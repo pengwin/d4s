@@ -133,10 +133,10 @@ gitea-admin:
 
 grafana-admin:
     @echo "Grafana username:"
-    @KUBECONFIG={{kubeconfig}} kubectl -n grafana get secret grafana-admin -o jsonpath="{.data.username}" | base64 -d
+    @KUBECONFIG={{kubeconfig}} kubectl -n observability get secret grafana-admin -o jsonpath="{.data.username}" | base64 -d
     @echo ""
     @echo "Grafana password:"
-    @KUBECONFIG={{kubeconfig}} kubectl -n grafana get secret grafana-admin -o jsonpath="{.data.password}" | base64 -d
+    @KUBECONFIG={{kubeconfig}} kubectl -n observability get secret grafana-admin -o jsonpath="{.data.password}" | base64 -d
 
 pi-hole-admin:
     @echo "Pi-hole password:"

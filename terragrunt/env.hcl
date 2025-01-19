@@ -9,7 +9,6 @@ locals {
       worker-node-1        = "172.16.122.13"
       worker-node-2        = "172.16.122.14"
       worker-node-3        = "172.16.122.15"
-      worker-node-4        = "172.16.122.16"
     }
   }
 
@@ -22,6 +21,7 @@ locals {
 
   pi_hole_domain         = "pi-hole.test-kubernetes"
   docker_registry_domain = "docker-registry.test-kubernetes"
+  docker_mirror_domain   = "docker-mirror.test-kubernetes"
   gitea_domain           = "gitea.test-kubernetes"
   argocd_domain          = "argocd.test-kubernetes"
   victoria_logs_domain   = "victoria-logs.test-kubernetes"

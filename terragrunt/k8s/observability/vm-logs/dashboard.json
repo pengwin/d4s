@@ -1,0 +1,256 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": false,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "id": 19,
+  "links": [],
+  "panels": [
+    {
+      "datasource": {
+        "type": "victoriametrics-logs-datasource",
+        "uid": "VictoriaLogs"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "inspect": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Time"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 163
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Line"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 946
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "labels"
+            },
+            "properties": [
+              {
+                "id": "custom.hidden",
+                "value": true
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "_stream_id"
+            },
+            "properties": [
+              {
+                "id": "custom.hidden",
+                "value": true
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "file"
+            },
+            "properties": [
+              {
+                "id": "custom.hidden",
+                "value": true
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 18,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "id": 1,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "countRows": false,
+          "enablePagination": true,
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "showHeader": true,
+        "sortBy": []
+      },
+      "pluginVersion": "11.3.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "victoriametrics-logs-datasource",
+            "uid": "VictoriaLogs"
+          },
+          "editorMode": "code",
+          "expr": "kubernetes.pod_namespace: \"${namespace}\" AND kubernetes.pod_name: \"${pod}\" AND kubernetes.container_name: \"${container}\" ",
+          "hide": false,
+          "queryType": "instant",
+          "refId": "A"
+        }
+      ],
+      "title": "Panel Title",
+      "transformations": [
+        {
+          "id": "extractFields",
+          "options": {
+            "source": "labels"
+          }
+        }
+      ],
+      "transparent": true,
+      "type": "table"
+    }
+  ],
+  "preload": false,
+  "schemaVersion": 40,
+  "tags": [],
+  "templating": {
+    "list": [
+      {
+        "current": {
+          "text": "observability",
+          "value": "observability"
+        },
+        "datasource": {
+          "type": "victoriametrics-logs-datasource",
+          "uid": "VictoriaLogs"
+        },
+        "definition": "",
+        "label": "Namespace",
+        "name": "namespace",
+        "options": [],
+        "query": {
+          "field": "kubernetes.pod_namespace",
+          "limit": 25,
+          "query": "",
+          "refId": "VictoriaLogsVariableQueryEditor-VariableQuery",
+          "type": "fieldValue"
+        },
+        "refresh": 1,
+        "regex": "",
+        "type": "query"
+      },
+      {
+        "current": {
+          "text": "grafana-operator-689967c5fd-ztf6g",
+          "value": "grafana-operator-689967c5fd-ztf6g"
+        },
+        "datasource": {
+          "type": "victoriametrics-logs-datasource",
+          "uid": "VictoriaLogs"
+        },
+        "definition": "kubernetes.pod_namespace: \"${namespace}\" ",
+        "label": "Pod",
+        "name": "pod",
+        "options": [],
+        "query": {
+          "field": "kubernetes.pod_name",
+          "limit": 25,
+          "query": "kubernetes.pod_namespace: \"${namespace}\" ",
+          "refId": "VictoriaLogsVariableQueryEditor-VariableQuery",
+          "type": "fieldValue"
+        },
+        "refresh": 1,
+        "regex": "",
+        "type": "query"
+      },
+      {
+        "current": {
+          "text": "grafana-operator",
+          "value": "grafana-operator"
+        },
+        "datasource": {
+          "type": "victoriametrics-logs-datasource",
+          "uid": "VictoriaLogs"
+        },
+        "definition": "kubernetes.pod_namespace: \"${namespace}\" AND kubernetes.pod_name: \"${pod}\" ",
+        "label": "Container",
+        "name": "container",
+        "options": [],
+        "query": {
+          "field": "kubernetes.container_name",
+          "limit": 25,
+          "query": "kubernetes.pod_namespace: \"${namespace}\" AND kubernetes.pod_name: \"${pod}\" ",
+          "refId": "VictoriaLogsVariableQueryEditor-VariableQuery",
+          "type": "fieldValue"
+        },
+        "refresh": 1,
+        "regex": "",
+        "type": "query"
+      }
+    ]
+  },
+  "time": {
+    "from": "now-1h",
+    "to": "now"
+  },
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "VictoriaLogs",
+  "uid": "eeai49js8kum8c",
+  "version": 1,
+  "weekStart": ""
+}

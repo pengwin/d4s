@@ -4,9 +4,8 @@ include "root" {
 }
 
 terraform {
-  source = "../../../../terraform/base-helm"
+  source = "../../../../terraform/grafana-instance"
 }
-
 
 dependency "nfs-storage-class" {
   config_path  = "../../system/nfs-storage-class"
@@ -23,55 +22,61 @@ dependency "ingress-nginx" {
   skip_outputs = true
 }
 
+dependency "grafana-operator" {
+  config_path  = "../grafana-operator"
+  skip_outputs = true
+}
+
 locals {
   grafana_admin_secret_name = "grafana-admin"
   admin_username            = "k8s_admin"
-}
-
-generate "grafana_admin_secret" {
-  path      = "_grafana_admin_secret.tf"
-  if_exists = "overwrite_terragrunt"
-  contents  = <<EOF
-
-resource "kubernetes_namespace" "grafana" {
-  metadata {
-    name = var.namespace
+  victoria_logs_plugin_init = {
+    name       = "load-vm-ds-plugin"
+    image      = "curlimages/curl:7.85.0"
+    command    = ["/bin/sh"]
+    workingDir = "/var/lib/grafana"
+    securityContext = {
+      runAsUser    = 472
+      runAsNonRoot = true
+      runAsGroup   = 472
+    }
+    args = [
+      "-c",
+      <<-EOT
+set -ex
+mkdir -p /var/lib/grafana/plugins/
+ver=v0.13.0
+curl -L https://github.com/VictoriaMetrics/victorialogs-datasource/releases/download/$ver/victoriametrics-logs-datasource-$ver.tar.gz -o /var/lib/grafana/plugins/vl-plugin.tar.gz
+tar -xf /var/lib/grafana/plugins/vl-plugin.tar.gz -C /var/lib/grafana/plugins/
+rm /var/lib/grafana/plugins/vl-plugin.tar.gz
+EOT
+    ]
+    volumeMounts = [
+      {
+        name      = "grafana-data"
+        mountPath = "/var/lib/grafana"
+      }
+    ]
   }
-}
-
-resource "random_password" "grafana_admin_password" {
-  length  = 16
-  special = true
-}
-
-resource "kubernetes_secret" "grafana_admin" {
-  metadata {
-    name      = "${local.grafana_admin_secret_name}"
-    namespace = var.namespace
-  }
-
-  type = "Opaque"
-
-  data = {
-    username = "${local.admin_username}"
-    password = random_password.grafana_admin_password.result
-  }
-}
-
-output "grafana_admin_username" {
-  value = "${local.admin_username}"
-  sensitive = true
-}
-
-output "grafana_admin_password" {
-  value = random_password.grafana_admin_password.result
-  sensitive = true
-}
-EOF
 }
 
 inputs = {
-  repository       = "https://grafana.github.io/helm-charts"
+  name                = "grafana"
+  namespace           = dependency.grafana-operator.inputs.namespace
+  instances           = 1
+  storage_class       = dependency.nfs-storage-class.inputs.storage_class_name
+  size                = "10Gi"
+  admin_secret_name   = local.grafana_admin_secret_name
+  username            = local.admin_username
+  hostname            = include.root.locals.env.grafana_domain
+  cluster_issuer_name = dependency.cert-issuer.inputs.cluster_issuer_name
+
+  allow_loading_unsigned_plugins = "victoriametrics-logs-datasource"
+  init_containers                = [local.victoria_logs_plugin_init]
+}
+
+
+/*repository       = "https://grafana.github.io/helm-charts"
   chart            = "grafana"
   chart_version    = "8.8.3"
   namespace        = "grafana"
@@ -85,7 +90,7 @@ inputs = {
         allow_loading_unsigned_plugins = "victoriametrics-logs-datasource"
       }
       log = {
-        mode = "console"
+        mode  = "console"
         level = "debug"
       }
     }
@@ -198,4 +203,4 @@ EOT
       ]
     }
   }
-}
+}*/

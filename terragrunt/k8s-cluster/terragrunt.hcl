@@ -15,8 +15,8 @@ locals {
   vms = { for vm_name, vm_ip in local.env.vm_network.nodes : vm_name => {
     ip            = vm_ip
     cpus          = 2
-    memory        = 2048
-    vdisk_size_gb = 20 # GB
+    memory        = startswith(vm_name, "control-plane-") ? 3 * 1024 : 2 * 1024 # MB
+    vdisk_size_gb = 20                                                          # GB
   } }
 
   vms_json = urlencode(jsonencode(local.vms))
