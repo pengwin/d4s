@@ -24,6 +24,5 @@ locals {
   docker_mirror_domain   = "docker-mirror.test-kubernetes"
   gitea_domain           = "gitea.test-kubernetes"
   argocd_domain          = "argocd.test-kubernetes"
-  victoria_logs_domain   = "victoria-logs.test-kubernetes"
   grafana_domain         = "grafana.test-kubernetes"
 }

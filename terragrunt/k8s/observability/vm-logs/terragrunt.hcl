@@ -115,28 +115,7 @@ inputs = {
       retentionDiskSpaceUsage = "1GiB"
 
       ingress = {
-        enabled          = true
-        ingressClassName = "nginx"
-        annotations = {
-          "cert-manager.io/cluster-issuer" = dependency.cert-issuer.inputs.cluster_issuer_name
-        }
-
-        hosts = [
-          {
-            name = include.root.locals.env.victoria_logs_domain
-            path = ["/"]
-            port = "http"
-          }
-        ]
-
-        tls = [
-          {
-            secretName = "victoria-logs-tls"
-            hosts = [
-              include.root.locals.env.victoria_logs_domain
-            ]
-          }
-        ]
+        enabled = false
       }
     }
   }
