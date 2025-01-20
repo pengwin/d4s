@@ -145,7 +145,7 @@
             "uid": "VictoriaLogs"
           },
           "editorMode": "code",
-          "expr": "kubernetes.pod_namespace: \"${namespace}\" AND kubernetes.pod_name: \"${pod}\" AND kubernetes.container_name: \"${container}\" ",
+          "expr": "kubernetes.pod_namespace: \"${namespace}\" AND kubernetes.pod_name: \"${pod}\" AND kubernetes.container_name: \"${container}\" \"${contains}\" ",
           "hide": false,
           "queryType": "instant",
           "refId": "A"
@@ -240,6 +240,23 @@
         "refresh": 1,
         "regex": "",
         "type": "query"
+      },
+      {
+        "current": {
+          "text": " ",
+          "value": " "
+        },
+        "label": "Contains",
+        "name": "contains",
+        "options": [
+          {
+            "selected": true,
+            "text": " ",
+            "value": " "
+          }
+        ],
+        "query": " ",
+        "type": "textbox"
       }
     ]
   },

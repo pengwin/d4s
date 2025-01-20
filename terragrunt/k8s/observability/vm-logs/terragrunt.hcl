@@ -38,12 +38,6 @@ locals {
   release_name = "victoria-logs"
 }
 
-generate "dashboard.json" {
-  path      = "_grafana-dashboard.json"
-  if_exists = "overwrite_terragrunt"
-  contents  = file("dashboard.json")
-}
-
 generate "dashboard" {
   path      = "_grafana-dashboard.tf"
   if_exists = "overwrite_terragrunt"
@@ -62,7 +56,7 @@ generate "dashboard" {
               dashboards = "grafana"
             }
           }
-          gzipJson = base64gzip(file("$${path.module}/_grafana-dashboard.json"))
+          json = file("$${path.module}/dashboard.json")
         }
       }
     }

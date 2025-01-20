@@ -38,12 +38,73 @@ dependency "grafana-operator" {
   skip_outputs = true
 }
 
+locals {
+  release_name = "victoria-metrics-k8s-stack"
+}
+
+generate "datasource" {
+  path      = "_grafana-datasource.tf"
+  if_exists = "overwrite_terragrunt"
+  contents  = <<-EOF
+    resource "kubernetes_manifest" "grafana_datasource_victoriametrics" {
+      manifest = {
+        apiVersion = "grafana.integreatly.org/v1beta1"
+        kind       = "GrafanaDatasource"
+        metadata = {
+          name      = "victoriametrics"
+          namespace = "${dependency.ns.inputs.name}"
+        }
+        spec = {
+          instanceSelector = {
+            matchLabels = {
+              dashboards = "grafana"
+            }
+          }
+          datasource = {
+            name      = "VictoriaMetrics"
+            type      = "prometheus"
+            access    = "proxy"
+            isDefault = true
+
+            url = "http://vmsingle-${local.release_name}:8429"
+          }
+        }
+      }
+    }
+
+    resource "kubernetes_manifest" "grafana_datasource_victoriametrics_ds" {
+      manifest = {
+        apiVersion = "grafana.integreatly.org/v1beta1"
+        kind       = "GrafanaDatasource"
+        metadata = {
+          name      = "victoriametrics-ds"
+          namespace = "${dependency.ns.inputs.name}"
+        }
+        spec = {
+          instanceSelector = {
+            matchLabels = {
+              dashboards = "grafana"
+            }
+          }
+          datasource = {
+            name   = "VictoriaMetrics (DS)"
+            type   = "victoriametrics-datasource"
+            access = "proxy"
+
+            url = "http://vmsingle-${local.release_name}:8429"
+          }
+        }
+      }
+    }
+    EOF
+}
+
 inputs = {
   repository       = "https://victoriametrics.github.io/helm-charts/"
   chart            = "victoria-metrics-k8s-stack"
   chart_version    = "0.33.5"
   namespace        = dependency.ns.inputs.name
-  release_name     = "victoria-metrics-k8s-stack"
+  release_name     = local.release_name
   create_namespace = false
 
   values = {
