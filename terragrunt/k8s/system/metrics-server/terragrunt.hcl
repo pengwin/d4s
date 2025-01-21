@@ -4,11 +4,11 @@ include "root" {
 }
 
 terraform {
-  source = "../../../../terraform/base-helm"
+  source = find_in_parent_folders("terraform/base-helm")
 }
 
 dependency "cni-calico" {
-  config_path  = "../cni-calico"
+  config_path  = find_in_parent_folders("cni-calico")
   skip_outputs = true
 }
 

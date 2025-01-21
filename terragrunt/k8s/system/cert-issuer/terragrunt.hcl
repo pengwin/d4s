@@ -8,7 +8,7 @@ terraform {
 }
 
 dependency "cert-manager" {
-  config_path  = "../cert-manager"
+  config_path  = find_in_parent_folders("cert-manager")
   skip_outputs = true
 }
 

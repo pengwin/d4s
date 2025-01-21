@@ -1,5 +1,5 @@
 terraform {
-  source = "../../../../terraform/gitea-configure"
+  source = find_in_parent_folders("terraform/gitea-configure")
 }
 
 include "root" {
@@ -8,12 +8,12 @@ include "root" {
 }
 
 dependency "gitea" {
-  config_path  = "../gitea"
+  config_path  = find_in_parent_folders("gitea")
   skip_outputs = true
 }
 
 dependency "gitea-ns" {
-  config_path  = "../gitea-ns"
+  config_path  = find_in_parent_folders("gitea-ns")
   skip_outputs = true
 }
 

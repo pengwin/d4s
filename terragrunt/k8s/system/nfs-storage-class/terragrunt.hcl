@@ -8,7 +8,7 @@ terraform {
 }
 
 dependency "csi-driver-nfs" {
-  config_path  = "../csi-driver-nfs"
+  config_path  = find_in_parent_folders("csi-driver-nfs")
   skip_outputs = true
 }
 

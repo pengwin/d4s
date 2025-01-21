@@ -4,11 +4,11 @@ include "root" {
 }
 
 terraform {
-  source = "../../../../terraform/base-helm"
+  source = find_in_parent_folders("terraform/base-helm")
 }
 
 dependency "pi-hole" {
-  config_path  = "../pi-hole"
+  config_path  = find_in_parent_folders("pi-hole")
   skip_outputs = true
 }
 

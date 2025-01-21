@@ -4,32 +4,32 @@ include "root" {
 }
 
 terraform {
-  source = "../../../../terraform/base-helm"
+  source = find_in_parent_folders("terraform/base-helm")
 }
 
 
 dependency "nfs-storage-class" {
-  config_path  = "../../system/nfs-storage-class"
+  config_path  = find_in_parent_folders("system/nfs-storage-class")
   skip_outputs = true
 }
 
 dependency "cert-issuer" {
-  config_path  = "../../system/cert-issuer"
+  config_path  = find_in_parent_folders("system/cert-issuer")
   skip_outputs = true
 }
 
 dependency "ingress-nginx" {
-  config_path  = "../../system/ingress-nginx"
+  config_path  = find_in_parent_folders("system/ingress-nginx")
   skip_outputs = true
 }
 
 dependency "ns" {
-  config_path  = "../observability-namespace"
+  config_path  = find_in_parent_folders("observability-namespace")
   skip_outputs = true
 }
 
 dependency "grafana-operator" {
-  config_path  = "../grafana-operator"
+  config_path  = find_in_parent_folders("grafana-operator")
   skip_outputs = true
 }
 

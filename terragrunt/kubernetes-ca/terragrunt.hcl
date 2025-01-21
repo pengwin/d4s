@@ -4,7 +4,7 @@ include "env" {
 }
 
 terraform {
-  source = "../../terraform/kubernetes-ca"
+  source = find_in_parent_folders("terraform/kubernetes-ca")
 }
 
 inputs = {

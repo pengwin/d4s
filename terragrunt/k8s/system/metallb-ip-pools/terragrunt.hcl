@@ -8,7 +8,7 @@ terraform {
 }
 
 dependency "metallb" {
-  config_path  = "../metallb"
+  config_path  = find_in_parent_folders("metallb")
   skip_outputs = true
 }
 

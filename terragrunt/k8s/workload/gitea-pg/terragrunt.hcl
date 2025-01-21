@@ -4,21 +4,21 @@ include "root" {
 }
 
 terraform {
-  source = "../../../../terraform/postgres-cluster"
+  source = find_in_parent_folders("terraform/postgres-cluster")
 }
 
 dependency "gitea-ns" {
-  config_path  = "../gitea-ns"
+  config_path  = find_in_parent_folders("gitea-ns")
   skip_outputs = true
 }
 
 dependency "nfs-storage-class" {
-  config_path  = "../../system/nfs-storage-class"
+  config_path  = find_in_parent_folders("system/nfs-storage-class")
   skip_outputs = true
 }
 
 dependency "postgres-operator" {
-  config_path  = "../../db/cnpg-postgres-operator"
+  config_path  = find_in_parent_folders("db/cnpg-postgres-operator")
   skip_outputs = true
 }
 

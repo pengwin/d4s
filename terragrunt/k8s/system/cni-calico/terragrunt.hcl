@@ -4,7 +4,7 @@ include "root" {
 }
 
 terraform {
-  source = "../../../../terraform/base-helm"
+  source = find_in_parent_folders("terraform/base-helm")
 }
 
 inputs = {

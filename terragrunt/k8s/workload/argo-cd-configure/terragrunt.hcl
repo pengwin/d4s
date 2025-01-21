@@ -1,5 +1,5 @@
 terraform {
-  source = "../../../../terraform/argo-cd-configure"
+  source = find_in_parent_folders("terraform/argo-cd-configure")
 }
 
 include "root" {
@@ -8,12 +8,12 @@ include "root" {
 }
 
 dependency "argo-cd" {
-  config_path  = "../argo-cd"
+  config_path  = find_in_parent_folders("argo-cd")
   skip_outputs = true
 }
 
 dependency "gitea-configure" {
-  config_path = "../gitea-configure"
+  config_path = find_in_parent_folders("gitea-configure")
 
   mock_outputs = {
     hello_world_deploy_ssh    = "mock hello world deploy ssh"
@@ -22,7 +22,7 @@ dependency "gitea-configure" {
 }
 
 dependency "gitea-create-repos" {
-  config_path = "../gitea-create-repos"
+  config_path = find_in_parent_folders("gitea-create-repos")
 
   skip_outputs = true
 }

@@ -4,16 +4,16 @@ include "root" {
 }
 
 terraform {
-  source = "../../../../terraform/base-helm"
+  source = find_in_parent_folders("terraform/base-helm")
 }
 
 dependency "ingress-nginx" {
-  config_path  = "../../system/ingress-nginx"
+  config_path  = find_in_parent_folders("system/ingress-nginx")
   skip_outputs = true
 }
 
 dependency "cert-issuer" {
-  config_path  = "../../system/cert-issuer"
+  config_path  = find_in_parent_folders("system/cert-issuer")
   skip_outputs = true
 }
 

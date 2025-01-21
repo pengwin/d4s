@@ -1,5 +1,5 @@
 terraform {
-  source = "../../../../terraform/gitea-create-repos"
+  source = find_in_parent_folders("terraform/gitea-create-repos")
 }
 
 include "root" {

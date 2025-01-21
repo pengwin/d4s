@@ -4,11 +4,11 @@ include "root" {
 }
 
 terraform {
-  source = "../../../../terraform/base-helm"
+  source = find_in_parent_folders("terraform/base-helm")
 }
 
 dependency "metallb_ip_pools" {
-  config_path  = "../metallb-ip-pools"
+  config_path  = find_in_parent_folders("metallb-ip-pools")
   skip_outputs = true
 }
 

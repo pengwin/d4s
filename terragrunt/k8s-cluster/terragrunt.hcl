@@ -1,3 +1,7 @@
+terraform {
+  source = find_in_parent_folders("terraform/k8s-cluster")
+}
+
 locals {
   env_config = read_terragrunt_config(find_in_parent_folders("env.hcl"))
   env        = local.env_config.locals
@@ -20,10 +24,6 @@ locals {
   } }
 
   vms_json = urlencode(jsonencode(local.vms))
-}
-
-terraform {
-  source = "../../terraform/k8s-cluster"
 }
 
 dependency "ca_cert" {
