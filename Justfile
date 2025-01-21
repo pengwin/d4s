@@ -71,6 +71,18 @@ docker-login:
 update-chrome-certs:
     certutil -d sql:$HOME/.pki/nssdb -A -t TC -n "test-kubernetes" -i .certs/ca.crt
 
+stop-cluster:
+    #!/usr/bin/env bash
+    vagrant_file="$(find ./terragrunt/k8s-cluster/.terragrunt-cache/ -name 'Vagrantfile')"
+    vagrant_dir="$(dirname $vagrant_file)"
+    (cd $vagrant_dir && vagrant halt)
+
+start-cluster:
+    #!/usr/bin/env bash
+    vagrant_file="$(find ./terragrunt/k8s-cluster/.terragrunt-cache/ -name 'Vagrantfile')"
+    vagrant_dir="$(dirname $vagrant_file)"
+    (cd $vagrant_dir && vagrant up)
+
 # Utility targets
 
 get-cluster-ip:

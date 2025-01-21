@@ -65,16 +65,6 @@ resource "kubernetes_secret" "gitea_admin" {
     email    = "${local.admin_email}"
   }
 }
-
-output "gitea_admin_username" {
-  value = "${local.admin_username}"
-  sensitive = true
-}
-
-output "gitea_admin_password" {
-  value = random_password.gitea_admin_password.result
-  sensitive = true
-}
 EOF
 }
 

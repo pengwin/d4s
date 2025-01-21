@@ -7,13 +7,9 @@ include "root" {
   expose = true
 }
 
-dependency "argo-cd-creds" {
-  config_path = "../argo-cd-creds"
-
-  mock_outputs = {
-    argocd_username = "mock argocd username"
-    argocd_password = "mock argocd password"
-  }
+dependency "argo-cd" {
+  config_path  = "../argo-cd"
+  skip_outputs = true
 }
 
 dependency "gitea-configure" {
@@ -33,9 +29,10 @@ dependency "gitea-create-repos" {
 
 inputs = {
   argocd_domain = include.root.locals.env.argocd_domain
-
-  argocd_admin_username = dependency.argo-cd-creds.outputs.argocd_username
-  argocd_admin_password = dependency.argo-cd-creds.outputs.argocd_password
+  argocd_credentials_secret = {
+    name      = "argocd-initial-admin-secret"
+    namespace = dependency.argo-cd.inputs.namespace
+  }
 
   hello_world_deploy_ssh    = dependency.gitea-configure.outputs.hello_world_deploy_ssh
   argocd_deploy_private_key = dependency.gitea-configure.outputs.argocd_deploy_private_key

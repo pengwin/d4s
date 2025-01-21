@@ -3,14 +3,12 @@ variable "argocd_domain" {
   type        = string
 }
 
-variable "argocd_admin_username" {
-  description = "The username of the ArgoCD admin"
-  type        = string
-}
-
-variable "argocd_admin_password" {
-  description = "The password of the ArgoCD admin"
-  type        = string
+variable "argocd_credentials_secret" {
+  description = "The Kubernetes secret containing the initial ArgoCD admin credentials"
+  type = object({
+    name      = string
+    namespace = string
+  })
 }
 
 variable "hello_world_deploy_ssh" {

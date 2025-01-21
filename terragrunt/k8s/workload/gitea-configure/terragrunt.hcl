@@ -8,29 +8,17 @@ include "root" {
 }
 
 dependency "gitea" {
-  config_path = "../gitea"
-
-  mock_outputs = {
-    gitea_admin_username = "mock gitea admin"
-    gitea_admin_password = "mock gitea password"
-  }
+  config_path  = "../gitea"
+  skip_outputs = true
 }
 
-generate "gitea_provider" {
-  path      = "_gitea_provider.tf"
-  if_exists = "overwrite_terragrunt"
-  contents  = <<EOF
-provider "gitea" {
-  base_url = "https://${include.root.locals.env.gitea_domain}"
-  username = "${dependency.gitea.outputs.gitea_admin_username}"
-  password = "${dependency.gitea.outputs.gitea_admin_password}"
-  insecure = true
-}
-provider "local" {
-}
-EOF
+dependency "gitea-ns" {
+  config_path  = "../gitea-ns"
+  skip_outputs = true
 }
 
 inputs = {
-  gitea_domain = include.root.locals.env.gitea_domain
+  gitea_domain                 = include.root.locals.env.gitea_domain
+  gitea_admin_secret_name      = dependency.gitea.inputs.values.gitea.admin.existingSecret
+  gitea_admin_secret_namespace = dependency.gitea-ns.inputs.name
 }
